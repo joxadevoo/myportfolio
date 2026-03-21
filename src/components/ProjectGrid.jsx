@@ -1,7 +1,9 @@
 import React, { useEffect, useState } from 'react';
+import { useTranslation } from 'react-i18next';
 import { supabase, isSupabaseConfigured } from '../lib/supabaseClient';
 
 export default function ProjectGrid() {
+  const { t } = useTranslation();
   const [projects, setProjects] = useState([]);
   const [loading, setLoading] = useState(true);
   const [errorMsg, setErrorMsg] = useState(null);
@@ -67,7 +69,7 @@ export default function ProjectGrid() {
       <section id="projects" style={{ background: 'rgba(0,20,40,0.3)' }}>
         <div className="section-header">
           <span className="section-num">// 04</span>
-          <h2 className="section-title">Projects</h2>
+          <h2 className="section-title">{t('projects.title')}</h2>
           <div className="section-line"></div>
         </div>
         <div className="container" style={{ maxWidth: '800px', margin: '0 auto' }}>
@@ -81,11 +83,11 @@ export default function ProjectGrid() {
             <div className="terminal-body" style={{ textAlign: 'center', padding: '40px' }}>
               {errorMsg ? (
                 <div className="t-out highlight" style={{ color: 'var(--accent3)' }}>
-                  ERROR: {errorMsg} - Connection failed. System undergoing maintenance.
+                  ERROR: {errorMsg} — {t('projects.error')}
                 </div>
               ) : (
                 <div className="t-out" style={{ color: 'var(--text-dim)', fontSize: '1.05rem' }}>
-                  <span className="blink">_</span> No projects deployed yet. Database is empty.
+                  <span className="blink">_</span> {t('projects.empty')}
                 </div>
               )}
             </div>
@@ -99,7 +101,7 @@ export default function ProjectGrid() {
     <section id="projects" style={{ background: 'rgba(0,20,40,0.3)' }}>
       <div className="section-header">
         <span className="section-num">// 04</span>
-        <h2 className="section-title">Projects</h2>
+        <h2 className="section-title">{t('projects.title')}</h2>
         <div className="section-line"></div>
       </div>
       <div className="projects-grid">

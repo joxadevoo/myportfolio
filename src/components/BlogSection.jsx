@@ -2,8 +2,10 @@ import React, { useEffect, useState } from 'react';
 import { Link } from 'react-router-dom';
 import { supabase, isSupabaseConfigured } from '../lib/supabaseClient';
 import { Calendar, Clock } from 'lucide-react';
+import { useTranslation } from 'react-i18next';
 
 export default function BlogSection() {
+  const { t } = useTranslation();
   const [posts, setPosts] = useState([]);
   const [loading, setLoading] = useState(true);
   const [errorMsg, setErrorMsg] = useState(null);
@@ -52,7 +54,7 @@ export default function BlogSection() {
       <section id="blog">
         <div className="section-header">
           <span className="section-num">// 05</span>
-          <h2 className="section-title">Blog Posts</h2>
+          <h2 className="section-title">{t('blog.title')}</h2>
           <div className="section-line"></div>
         </div>
         <div className="container" style={{ maxWidth: '800px', margin: '0 auto' }}>
@@ -66,11 +68,11 @@ export default function BlogSection() {
             <div className="terminal-body" style={{ textAlign: 'center', padding: '40px' }}>
               {errorMsg ? (
                 <div className="t-out highlight" style={{ color: 'var(--accent3)' }}>
-                  ERROR: {errorMsg} - Connection failed. System undergoing maintenance.
+                  ERROR: {errorMsg} — {t('blog.error')}
                 </div>
               ) : (
                 <div className="t-out" style={{ color: 'var(--text-dim)', fontSize: '1.05rem' }}>
-                  <span className="blink">_</span> No entries found. Blog database is currently empty.
+                  <span className="blink">_</span> {t('blog.empty')}
                 </div>
               )}
             </div>
@@ -102,7 +104,7 @@ export default function BlogSection() {
               <div className="blog-title">{p.title}</div>
               <div className="blog-excerpt">{p.excerpt}</div>
               <div className="blog-meta">
-                <span style={{ display: 'flex', alignItems: 'center', gap: '6px' }}><Calendar size={12} color="var(--accent)" /> {p.date || 'Recent'}</span>
+                <span style={{ display: 'flex', alignItems: 'center', gap: '6px' }}><Calendar size={12} color="var(--accent)" /> {p.date || t('blog.recent')}</span>
                 <span style={{ display: 'flex', alignItems: 'center', gap: '6px' }}><Clock size={12} color="var(--accent)" /> {p.readTime || '5 min read'}</span>
               </div>
             </div>

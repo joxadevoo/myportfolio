@@ -1,0 +1,79 @@
+{
+  "nav": {
+    "about": "Haqimda",
+    "skills": "Ko'nikmalar",
+    "certs": "Sertifikatlar",
+    "projects": "Loyihalar",
+    "blog": "Blog",
+    "contact": "Aloqa",
+    "back": "Bosh sahifaga"
+  },
+  "hero": {
+    "tag": "Kiberxavfsizlik Mutaxassisi",
+    "iam": "Men",
+    "subtitle": "Xavfsizlik Tahlilchisi · Tarmoq Himoyachisi · CTF O'yinchisi",
+    "desc": "Raqamli infratuzilmani himoya qilish va zaifliklарni tajovuzkorlardan oldin aniqlashga ishtiyoqli. Hozirda Google Kiberxavfsizlik Sertifikati dasturida o'qimoqdaman.",
+    "viewProjects": "LOYIHALARNI KO'RISH",
+    "contactMe": "BOG'LANISH",
+    "certificates": "Sertifikatlar",
+    "projects": "Loyihalar",
+    "yearsLearning": "Yil O'rganish"
+  },
+  "about": {
+    "title": "Haqimda",
+    "p1": "Men O'zbekistondan bo'lgan ishtiyoqli kiberxavfsizlik ishqibozi bo'lib, raqamli himoya san'atini o'zlashtirishga bag'ishlangan. Mening sayohatim tizimlar qanday ishlashiga qiziquvchanlik bilan boshlandi va ularni himoya qilish majburiyatiga aylandi.",
+    "p2": "Google Kiberxavfsizlik Sertifikati dasturida o'qib, tarmoq xavfsizligi, tahdidlarni tahlil qilish, SIEM vositalari va hodisalarga javob berish bo'yicha mutaxassislik oshirayapman.",
+    "location": "Joylashuv",
+    "status": "Holat",
+    "statusVal": "Ish Qidiryapman",
+    "focus": "Yo'nalish",
+    "languages": "Tillar"
+  },
+  "skills": {
+    "title": "Ko'nikmalar",
+    "networkSecurity": "Tarmoq Xavfsizligi",
+    "linux": "Linux",
+    "python": "Python",
+    "sql": "SQL",
+    "siem": "SIEM Vositalari",
+    "incident": "Hodisaga Javob"
+  },
+  "certs": {
+    "title": "Sertifikatlar",
+    "inProgress": "Jarayonda",
+    "planned": "Rejalashtirilgan"
+  },
+  "projects": {
+    "title": "Loyihalar",
+    "empty": "Hech qanday loyiha topilmadi. Baza hozircha bo'sh.",
+    "error": "Ulanish muvaffaqiyatsiz. Tizim texnik xizmatda."
+  },
+  "blog": {
+    "title": "Blog Yozuvlari",
+    "empty": "Hech qanday yozuv topilmadi. Blog bazasi hozircha bo'sh.",
+    "error": "Ulanish muvaffaqiyatsiz. Tizim texnik xizmatda.",
+    "recent": "So'nggi",
+    "readMore": "BATAFSIL O'QISH"
+  },
+  "contact": {
+    "title": "Aloqa",
+    "heading": "Bog'lanaylik",
+    "desc": "Kiberxavfsizlik, masofaviy ish va hamkorlik bo'yicha imkoniyatlarga occhiqman. Bemalol yozing!",
+    "name": "Ismingiz",
+    "email": "Elektron pochta",
+    "message": "Xabar",
+    "placeholder": "Xabaringizni yozing...",
+    "send": "XABAR YUBORISH",
+    "sending": "UZATILMOQDA...",
+    "success": "Xabar xavfsiz yuborildi!"
+  },
+  "footer": {
+    "rights": "Barcha huquqlar himoyalangan",
+    "builtWith": "Yaratildi"
+  },
+  "notFound": {
+    "title": "KRITIK XATO: TUGUN TOPILMADI",
+    "desc": "So'ralgan payload ushbu serverda mavjud emas. Ulanish rad etildi yoki katalog cheklangan.",
+    "back": "ULANISHNI QAYTA BOSHLASH"
+  }
+}

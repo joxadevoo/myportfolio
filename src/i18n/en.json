@@ -1,0 +1,79 @@
+{
+  "nav": {
+    "about": "About",
+    "skills": "Skills",
+    "certs": "Certs",
+    "projects": "Projects",
+    "blog": "Blog",
+    "contact": "Contact",
+    "back": "Back to Home"
+  },
+  "hero": {
+    "tag": "Cybersecurity Professional",
+    "iam": "I'm",
+    "subtitle": "Security Analyst · Network Defender · CTF Player",
+    "desc": "Passionate about protecting digital infrastructure and identifying vulnerabilities before attackers do. Currently advancing through Google Cybersecurity Certificate program.",
+    "viewProjects": "VIEW PROJECTS",
+    "contactMe": "CONTACT ME",
+    "certificates": "Certificates",
+    "projects": "Projects",
+    "yearsLearning": "Years Learning"
+  },
+  "about": {
+    "title": "About Me",
+    "p1": "I am a passionate cybersecurity enthusiast from Uzbekistan, dedicated to mastering the art of digital defense. My journey began with a curiosity about how systems work and evolved into a commitment to protecting them.",
+    "p2": "Currently enrolled in the Google Cybersecurity Certificate program, I am building expertise in network security, threat analysis, SIEM tools, and incident response.",
+    "location": "Location",
+    "status": "Status",
+    "statusVal": "Open to Work",
+    "focus": "Focus",
+    "languages": "Languages"
+  },
+  "skills": {
+    "title": "Skills",
+    "networkSecurity": "Network Security",
+    "linux": "Linux",
+    "python": "Python",
+    "sql": "SQL",
+    "siem": "SIEM Tools",
+    "incident": "Incident Response"
+  },
+  "certs": {
+    "title": "Certifications",
+    "inProgress": "In Progress",
+    "planned": "Planned"
+  },
+  "projects": {
+    "title": "Projects",
+    "empty": "No projects deployed yet. Database is empty.",
+    "error": "Connection failed. System undergoing maintenance."
+  },
+  "blog": {
+    "title": "Blog Posts",
+    "empty": "No entries found. Blog database is currently empty.",
+    "error": "Connection failed. System undergoing maintenance.",
+    "recent": "Recent",
+    "readMore": "READ MORE"
+  },
+  "contact": {
+    "title": "Contact",
+    "heading": "Let's Connect",
+    "desc": "Open to opportunities in cybersecurity, remote work, and collaboration. Feel free to reach out!",
+    "name": "Your Name",
+    "email": "Email",
+    "message": "Message",
+    "placeholder": "Your message here...",
+    "send": "SEND MESSAGE",
+    "sending": "TRANSMITTING...",
+    "success": "Message sent securely!"
+  },
+  "footer": {
+    "rights": "All rights reserved",
+    "builtWith": "Built with"
+  },
+  "notFound": {
+    "title": "CRITICAL ERROR: NODE NOT FOUND",
+    "desc": "The requested payload does not exist on this server. Connection rejected or directory has been restricted.",
+    "back": "REBOOT CONNECTION"
+  }
+}

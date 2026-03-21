@@ -1,32 +1,34 @@
 import React from 'react';
+import { useTranslation } from 'react-i18next';
 
 export default function About() {
+  const { t } = useTranslation();
   return (
     <section id="about">
       <div className="section-header">
         <span className="section-num">// 01</span>
-        <h2 className="section-title">About Me</h2>
+        <h2 className="section-title">{t('about.title')}</h2>
         <div className="section-line"></div>
       </div>
       <div className="about-grid">
         <div className="about-text">
-          <p>I am a passionate cybersecurity enthusiast from Uzbekistan, dedicated to mastering the art of digital defense. My journey began with a curiosity about how systems work and evolved into a commitment to protecting them.</p>
-          <p>Currently enrolled in the Google Cybersecurity Certificate program, I am building expertise in network security, threat analysis, SIEM tools, and incident response.</p>
+          <p>{t('about.p1')}</p>
+          <p>{t('about.p2')}</p>
           <div className="about-info">
             <div className="info-item">
-              <div className="info-label">Location</div>
+              <div className="info-label">{t('about.location')}</div>
               <div className="info-value">Uzbekistan</div>
             </div>
             <div className="info-item">
-              <div className="info-label">Status</div>
-              <div className="info-value">Open to Work</div>
+              <div className="info-label">{t('about.status')}</div>
+              <div className="info-value">{t('about.statusVal')}</div>
             </div>
             <div className="info-item">
-              <div className="info-label">Focus</div>
+              <div className="info-label">{t('about.focus')}</div>
               <div className="info-value">Cybersecurity</div>
             </div>
             <div className="info-item">
-              <div className="info-label">Languages</div>
+              <div className="info-label">{t('about.languages')}</div>
               <div className="info-value">UZ / EN / TR</div>
             </div>
           </div>
