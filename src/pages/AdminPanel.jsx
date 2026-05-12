@@ -11,6 +11,10 @@ export default function AdminPanel() {
   const [activeTab, setActiveTab] = useState('project'); 
   const [projectForm, setProjectForm] = useState({ title: '', tag: '', description: '', tools: '' });
   const [postForm, setPostForm] = useState({ title: '', cat: '', excerpt: '', content: '', image: '' });
+  const [skillForm, setSkillForm] = useState({ name: '', icon: 'Shield', percent: 70, sort_order: 0 });
+  const [certForm, setCertForm] = useState({ title: '', issuer: '', date: '', icon: 'Award', sort_order: 0 });
+  const [skillsList, setSkillsList] = useState([]);
+  const [certsList, setCertsList] = useState([]);
   const [status, setStatus] = useState(null); 
   const inputRef = useRef(null);
 
@@ -41,6 +45,21 @@ export default function AdminPanel() {
 
   const clearStatus = () => {
     setTimeout(() => setStatus(null), 5000);
+  };
+
+  // Load skills & certs when those tabs are opened
+  useEffect(() => {
+    if (activeTab === 'skill') fetchSkills();
+    if (activeTab === 'cert') fetchCerts();
+  }, [activeTab]);
+
+  const fetchSkills = async () => {
+    const { data } = await supabase.from('skills').select('*').order('sort_order', { ascending: true });
+    setSkillsList(data || []);
+  };
+  const fetchCerts = async () => {
+    const { data } = await supabase.from('certifications').select('*').order('sort_order', { ascending: true });
+    setCertsList(data || []);
   };
 
   const handleProjectSubmit = async (e) => {
@@ -95,6 +114,31 @@ export default function AdminPanel() {
       setPostForm({ title: '', cat: '', excerpt: '', content: '', image: '' });
       clearStatus();
     }
+  };
+
+  const handleSkillSubmit = async (e) => {
+    e.preventDefault();
+    setStatus({ type: 'loading', msg: 'Adding skill...' });
+    const { error } = await supabase.from('skills').insert([{ ...skillForm, percent: Number(skillForm.percent), sort_order: Number(skillForm.sort_order) }]);
+    if (error) { setStatus({ type: 'error', msg: `ERROR: ${error.message}` }); }
+    else { setStatus({ type: 'success', msg: 'SKILL ADDED!' }); setSkillForm({ name: '', icon: 'Shield', percent: 70, sort_order: 0 }); fetchSkills(); clearStatus(); }
+  };
+
+  const handleCertSubmit = async (e) => {
+    e.preventDefault();
+    setStatus({ type: 'loading', msg: 'Adding certification...' });
+    const { error } = await supabase.from('certifications').insert([{ ...certForm, sort_order: Number(certForm.sort_order) }]);
+    if (error) { setStatus({ type: 'error', msg: `ERROR: ${error.message}` }); }
+    else { setStatus({ type: 'success', msg: 'CERT ADDED!' }); setCertForm({ title: '', issuer: '', date: '', icon: 'Award', sort_order: 0 }); fetchCerts(); clearStatus(); }
+  };
+
+  const deleteSkill = async (id) => {
+    await supabase.from('skills').delete().eq('id', id);
+    fetchSkills();
+  };
+  const deleteCert = async (id) => {
+    await supabase.from('certifications').delete().eq('id', id);
+    fetchCerts();
   };
 
   if (!auth) {
@@ -160,9 +204,11 @@ export default function AdminPanel() {
            <span style={{ color: 'var(--accent)', fontFamily: 'Share Tech Mono', fontSize: '0.9rem' }}><span className="blink">_</span> WELCOME, ROOT</span>
         </div>
 
-        <div style={{ display: 'flex', gap: '15px', marginBottom: '30px' }}>
-          <button onClick={() => {setActiveTab('project'); setStatus(null);}} className={activeTab === 'project' ? 'btn-primary' : 'btn-secondary'} style={{ flex: 1 }}>DEPLOY PROJECT</button>
-          <button onClick={() => {setActiveTab('post'); setStatus(null);}} className={activeTab === 'post' ? 'btn-primary' : 'btn-secondary'} style={{ flex: 1 }}>DEPLOY BLOG POST</button>
+        <div style={{ display: 'flex', gap: '10px', marginBottom: '30px', flexWrap: 'wrap' }}>
+          <button onClick={() => {setActiveTab('project'); setStatus(null);}} className={activeTab === 'project' ? 'btn-primary' : 'btn-secondary'} style={{ flex: 1, minWidth: '130px' }}>PROJECTS</button>
+          <button onClick={() => {setActiveTab('post'); setStatus(null);}} className={activeTab === 'post' ? 'btn-primary' : 'btn-secondary'} style={{ flex: 1, minWidth: '130px' }}>BLOG POSTS</button>
+          <button onClick={() => {setActiveTab('skill'); setStatus(null);}} className={activeTab === 'skill' ? 'btn-primary' : 'btn-secondary'} style={{ flex: 1, minWidth: '130px' }}>SKILLS</button>
+          <button onClick={() => {setActiveTab('cert'); setStatus(null);}} className={activeTab === 'cert' ? 'btn-primary' : 'btn-secondary'} style={{ flex: 1, minWidth: '130px' }}>CERTS</button>
         </div>
 
         <div className="about-terminal">
@@ -210,7 +256,8 @@ export default function AdminPanel() {
                 </div>
                 <button type="submit" className="btn-primary" style={{ marginTop: '30px', width: '100%', padding: '15px' }}>DEPLOY PAYLOAD</button>
               </form>
-            ) : (
+
+            ) : activeTab === 'post' ? (
               <form onSubmit={handlePostSubmit} style={{ maxWidth: '700px', margin: '0 auto' }}>
                  <div style={{ display: 'flex', flexDirection: 'column', gap: '20px' }}>
                   <div style={{ display: 'grid', gridTemplateColumns: '1fr 1fr', gap: '20px' }}>
@@ -223,17 +270,14 @@ export default function AdminPanel() {
                       <input type="text" className="form-input" required value={postForm.cat} onChange={e => setPostForm({...postForm, cat: e.target.value})} placeholder="Linux" />
                     </div>
                   </div>
-
                   <div className="form-group">
                     <label className="form-label">Cover Image URL (Link)</label>
                     <input type="url" className="form-input" value={postForm.image} onChange={e => setPostForm({...postForm, image: e.target.value})} placeholder="https://example.com/cyber-image.jpg" />
                   </div>
-
                   <div className="form-group">
                     <label className="form-label">Excerpt (Preview String)</label>
                     <textarea className="form-input" required rows="2" value={postForm.excerpt} onChange={e => setPostForm({...postForm, excerpt: e.target.value})}></textarea>
                   </div>
-
                   <div className="form-group" data-color-mode="dark">
                     <label className="form-label">Full Content (Markdown allowed)</label>
                     <MDEditor 
@@ -245,9 +289,99 @@ export default function AdminPanel() {
                     />
                   </div>
                 </div>
-
                 <button type="submit" className="btn-primary" style={{ marginTop: '30px', width: '100%', padding: '15px' }}>PUBLISH ENTRY</button>
               </form>
+
+            ) : activeTab === 'skill' ? (
+              <div style={{ maxWidth: '600px', margin: '0 auto' }}>
+                <form onSubmit={handleSkillSubmit}>
+                  <div style={{ display: 'flex', flexDirection: 'column', gap: '15px' }}>
+                    <div style={{ display: 'grid', gridTemplateColumns: '2fr 1fr 1fr', gap: '15px' }}>
+                      <div className="form-group">
+                        <label className="form-label">Skill Name</label>
+                        <input type="text" className="form-input" required value={skillForm.name} onChange={e => setSkillForm({...skillForm, name: e.target.value})} placeholder="Network Security" />
+                      </div>
+                      <div className="form-group">
+                        <label className="form-label">Percent %</label>
+                        <input type="number" min="0" max="100" className="form-input" required value={skillForm.percent} onChange={e => setSkillForm({...skillForm, percent: e.target.value})} />
+                      </div>
+                      <div className="form-group">
+                        <label className="form-label">Order</label>
+                        <input type="number" className="form-input" value={skillForm.sort_order} onChange={e => setSkillForm({...skillForm, sort_order: e.target.value})} />
+                      </div>
+                    </div>
+                    <div className="form-group">
+                      <label className="form-label">Icon Name</label>
+                      <select className="form-input" value={skillForm.icon} onChange={e => setSkillForm({...skillForm, icon: e.target.value})}>
+                        {['Shield','Terminal','Code','Database','Activity','ShieldAlert','Wifi','Lock','Globe','Server','Eye','Cpu'].map(ic => <option key={ic} value={ic}>{ic}</option>)}
+                      </select>
+                    </div>
+                  </div>
+                  <button type="submit" className="btn-primary" style={{ marginTop: '20px', width: '100%', padding: '14px' }}>+ ADD SKILL</button>
+                </form>
+
+                {skillsList.length > 0 && (
+                  <div style={{ marginTop: '30px' }}>
+                    <div style={{ fontFamily: 'Share Tech Mono', fontSize: '0.75rem', color: 'var(--accent)', marginBottom: '12px', letterSpacing: '2px' }}>EXISTING SKILLS</div>
+                    {skillsList.map(s => (
+                      <div key={s.id} style={{ display: 'flex', justifyContent: 'space-between', alignItems: 'center', padding: '10px 15px', border: '1px solid var(--border)', marginBottom: '8px' }}>
+                        <span style={{ color: 'var(--text)', fontFamily: 'Share Tech Mono' }}>{s.name} <span style={{ color: 'var(--accent)' }}>{s.percent}%</span></span>
+                        <button onClick={() => deleteSkill(s.id)} style={{ background: 'transparent', border: '1px solid var(--accent3)', color: 'var(--accent3)', padding: '4px 12px', cursor: 'pointer', fontFamily: 'Share Tech Mono', fontSize: '0.7rem' }}>DELETE</button>
+                      </div>
+                    ))}
+                  </div>
+                )}
+              </div>
+
+            ) : (
+              <div style={{ maxWidth: '600px', margin: '0 auto' }}>
+                <form onSubmit={handleCertSubmit}>
+                  <div style={{ display: 'flex', flexDirection: 'column', gap: '15px' }}>
+                    <div className="form-group">
+                      <label className="form-label">Certificate Title</label>
+                      <input type="text" className="form-input" required value={certForm.title} onChange={e => setCertForm({...certForm, title: e.target.value})} placeholder="Google Cybersecurity Certificate" />
+                    </div>
+                    <div style={{ display: 'grid', gridTemplateColumns: '1fr 1fr', gap: '15px' }}>
+                      <div className="form-group">
+                        <label className="form-label">Issuer</label>
+                        <input type="text" className="form-input" required value={certForm.issuer} onChange={e => setCertForm({...certForm, issuer: e.target.value})} placeholder="Google / Coursera" />
+                      </div>
+                      <div className="form-group">
+                        <label className="form-label">Date</label>
+                        <input type="text" className="form-input" required value={certForm.date} onChange={e => setCertForm({...certForm, date: e.target.value})} placeholder="In Progress — 2024" />
+                      </div>
+                    </div>
+                    <div style={{ display: 'grid', gridTemplateColumns: '1fr 1fr', gap: '15px' }}>
+                      <div className="form-group">
+                        <label className="form-label">Icon Name</label>
+                        <select className="form-input" value={certForm.icon} onChange={e => setCertForm({...certForm, icon: e.target.value})}>
+                          {['Award','Lock','Globe','ClipboardCheck','Shield','Star','BookOpen','CheckCircle'].map(ic => <option key={ic} value={ic}>{ic}</option>)}
+                        </select>
+                      </div>
+                      <div className="form-group">
+                        <label className="form-label">Order</label>
+                        <input type="number" className="form-input" value={certForm.sort_order} onChange={e => setCertForm({...certForm, sort_order: e.target.value})} />
+                      </div>
+                    </div>
+                  </div>
+                  <button type="submit" className="btn-primary" style={{ marginTop: '20px', width: '100%', padding: '14px' }}>+ ADD CERTIFICATION</button>
+                </form>
+
+                {certsList.length > 0 && (
+                  <div style={{ marginTop: '30px' }}>
+                    <div style={{ fontFamily: 'Share Tech Mono', fontSize: '0.75rem', color: 'var(--accent)', marginBottom: '12px', letterSpacing: '2px' }}>EXISTING CERTIFICATIONS</div>
+                    {certsList.map(c => (
+                      <div key={c.id} style={{ display: 'flex', justifyContent: 'space-between', alignItems: 'center', padding: '10px 15px', border: '1px solid var(--border)', marginBottom: '8px' }}>
+                        <div>
+                          <div style={{ color: 'var(--text)', fontFamily: 'Share Tech Mono', fontSize: '0.85rem' }}>{c.title}</div>
+                          <div style={{ color: 'var(--text-dim)', fontSize: '0.75rem' }}>{c.issuer} — {c.date}</div>
+                        </div>
+                        <button onClick={() => deleteCert(c.id)} style={{ background: 'transparent', border: '1px solid var(--accent3)', color: 'var(--accent3)', padding: '4px 12px', cursor: 'pointer', fontFamily: 'Share Tech Mono', fontSize: '0.7rem' }}>DELETE</button>
+                      </div>
+                    ))}
+                  </div>
+                )}
+              </div>
             )}
           </div>
         </div>

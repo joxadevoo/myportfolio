@@ -1,13 +1,18 @@
 import React, { useEffect, useState } from 'react';
 import { useParams, Link } from 'react-router-dom';
 import { supabase, isSupabaseConfigured } from '../lib/supabaseClient';
-import { ArrowLeft, Clock, Calendar, Eye, Twitter, Linkedin, Link as LinkIcon } from 'lucide-react';
+import { ArrowLeft, Clock, Calendar, Eye, Twitter, Linkedin, Link as LinkIcon, ThumbsUp, ThumbsDown } from 'lucide-react';
+import { useTranslation } from 'react-i18next';
 import MDEditor from '@uiw/react-md-editor';
 
 export default function BlogPost() {
   const { id } = useParams();
   const [post, setPost] = useState(null);
+  const { t } = useTranslation();
   const [loading, setLoading] = useState(true);
+  const [likes, setLikes] = useState(0);
+  const [dislikes, setDislikes] = useState(0);
+  const [userAction, setUserAction] = useState(null); // 'like' | 'dislike' | null
 
   useEffect(() => {
     window.scrollTo(0, 0);
@@ -34,6 +39,8 @@ export default function BlogPost() {
           ];
           const found = dummyData.find(p => p.id === id);
           setPost(found);
+          setLikes(found?.likes || 0);
+          setDislikes(found?.dislikes || 0);
           setLoading(false);
           return;
         }
@@ -44,6 +51,8 @@ export default function BlogPost() {
         // Setup initial post view optimistically
         const newViews = (data.views || 0) + 1;
         setPost({ ...data, views: newViews });
+        setLikes(data.likes || 0);
+        setDislikes(data.dislikes || 0);
         
         // Background DB Update
         await supabase.from('blog_posts').update({ views: newViews }).eq('id', id);
@@ -58,105 +67,125 @@ export default function BlogPost() {
 
   const copyLink = () => {
     navigator.clipboard.writeText(window.location.href);
-    alert('Payload URL copied to clipboard!');
+    alert(t('blog.linkCopied') || 'Link copied to clipboard!');
+  };
+
+  const handleInteraction = async (action) => {
+    if (userAction === action) return; // Already clicked
+
+    let newLikes = likes;
+    let newDislikes = dislikes;
+
+    if (action === 'like') {
+      newLikes += 1;
+      if (userAction === 'dislike') newDislikes -= 1;
+    } else {
+      newDislikes += 1;
+      if (userAction === 'like') newLikes -= 1;
+    }
+
+    setLikes(newLikes);
+    setDislikes(newDislikes);
+    setUserAction(action);
+
+    if (isSupabaseConfigured && post) {
+      try {
+        await supabase.from('blog_posts').update({ likes: newLikes, dislikes: newDislikes }).eq('id', id);
+      } catch (err) {
+        // Ignore error if columns don't exist yet
+      }
+    }
   };
 
   if (loading) {
     return <section style={{ minHeight: '100vh', display: 'flex', alignItems: 'center', justifyContent: 'center' }}>
-      <div className="terminal-title blink" style={{ fontSize: '1.5rem' }}>Loading secure transmission...</div>
+      <div style={{ fontSize: '1.25rem', color: 'var(--text-muted)' }}>{t('blog.loading') || 'Loading...'}</div>
     </section>;
   }
 
   if (!post) {
     return <section style={{ minHeight: '100vh', display: 'flex', alignItems: 'center', justifyContent: 'center' }}>
-      <div className="terminal-title" style={{ fontSize: '1.5rem', color: 'var(--accent3)' }}>Error 404: Payload not found.</div>
+      <div style={{ fontSize: '1.25rem', color: 'var(--text-muted)' }}>{t('blog.notFound') || 'Article not found.'}</div>
     </section>;
   }
 
   return (
-    <section style={{ minHeight: '100vh', display: 'flex', flexDirection: 'column', alignItems: 'center', justifyContent: 'center', padding: '120px 20px 80px' }}>
-      <div style={{ width: '100%', maxWidth: '850px' }}>
+    <section style={{ minHeight: '100vh', padding: '120px 20px 80px', display: 'flex', justifyContent: 'center' }}>
+      <div style={{ width: '100%', maxWidth: '720px' }}>
         
-        <Link to="/#blog" className="btn-secondary" style={{ display: 'inline-flex', gap: '10px', marginBottom: '30px', padding: '10px 20px', clipPath: 'none' }}>
-          <ArrowLeft size={16} /> RETURN TO MAINFRAME
+        <Link to="/#blog" style={{ display: 'inline-flex', alignItems: 'center', gap: '8px', marginBottom: '48px', color: 'var(--text-muted)', fontSize: '0.875rem', textDecoration: 'none', transition: 'color var(--transition-smooth)' }} onMouseOver={(e) => e.currentTarget.style.color = 'var(--text-main)'} onMouseOut={(e) => e.currentTarget.style.color = 'var(--text-muted)'}>
+          <ArrowLeft size={16} /> {t('blog.back') || 'Back to Articles'}
         </Link>
         
-        <article className="about-terminal" style={{ margin: '0 auto', boxShadow: '0 10px 40px rgba(0,0,0,0.5)' }}>
-          <div className="terminal-bar" style={{ display: 'flex', justifyContent: 'space-between', alignItems: 'center' }}>
-            <div style={{ display: 'flex', alignItems: 'center', gap: '8px' }}>
-              <div className="dot red"></div>
-              <div className="dot yellow"></div>
-              <div className="dot green"></div>
-              <span className="terminal-title">view_payload_{id}.sh</span>
+        <article>
+          <div style={{ marginBottom: '40px' }}>
+            <div className="blog-cat" style={{ marginBottom: '16px' }}>{post.cat || 'Article'}</div>
+            <h1 style={{ fontFamily: 'var(--font-display)', fontSize: 'clamp(2.5rem, 5vw, 3.5rem)', fontWeight: 500, lineHeight: 1.1, marginBottom: '24px', letterSpacing: '-0.02em' }}>
+              {post.title}
+            </h1>
+            
+            <div style={{ display: 'flex', flexWrap: 'wrap', gap: '24px', color: 'var(--text-muted)', fontSize: '0.875rem', borderBottom: '1px solid var(--border)', paddingBottom: '32px' }}>
+              <span style={{ display: 'flex', alignItems: 'center', gap: '8px' }}>
+                <Calendar size={16} /> {post.date || t('blog.recent') || 'Recent'}
+              </span>
+              <span style={{ display: 'flex', alignItems: 'center', gap: '8px' }}>
+                <Clock size={16} /> {post.readTime || `5 ${t('blog.minRead') || 'min read'}`}
+              </span>
+              <span style={{ display: 'flex', alignItems: 'center', gap: '8px' }}>
+                <Eye size={16} /> {post.views} {t('blog.views') || 'views'}
+              </span>
             </div>
-            <div className="blog-cat" style={{ margin: 0 }}>{post.cat || 'Article'}</div>
           </div>
           
-          <div className="terminal-body" style={{ padding: '50px 40px' }}>
-            {post.icon && post.icon.startsWith('http') && (
-               <div style={{ width: '100%', height: '300px', marginBottom: '35px', borderRadius: '4px', overflow: 'hidden' }}>
-                 <img src={post.icon} alt={post.title} style={{ width: '100%', height: '100%', objectFit: 'cover' }} />
-               </div>
-            )}
-            <h1 style={{ fontSize: 'clamp(2rem, 4vw, 2.8rem)', marginBottom: '25px', lineHeight: 1.2 }}>{post.title}</h1>
+          {post.icon && post.icon.startsWith('http') && (
+            <div style={{ width: '100%', aspectRatio: '16/9', marginBottom: '48px', borderRadius: '16px', overflow: 'hidden', background: 'var(--bg-secondary)', border: '1px solid var(--border)' }}>
+              <img src={post.icon} alt={post.title} style={{ width: '100%', height: '100%', objectFit: 'cover' }} />
+            </div>
+          )}
             
-            {/* Meta Data Row */}
-            <div style={{ 
-              display: 'flex', flexWrap: 'wrap', gap: '20px', 
-              marginBottom: '40px', paddingBottom: '20px', 
-              borderBottom: '1px solid var(--border)',
-              fontFamily: 'Share Tech Mono', fontSize: '0.85rem', color: 'var(--text-dim)'
-            }}>
-              <span style={{ display: 'flex', alignItems: 'center', gap: '6px' }}>
-                <Calendar size={14} color="var(--accent)" /> {post.date || 'Recent'}
-              </span>
-              <span style={{ display: 'flex', alignItems: 'center', gap: '6px' }}>
-                <Clock size={14} color="var(--accent)" /> {post.readTime || '5 min read'}
-              </span>
-              <span style={{ display: 'flex', alignItems: 'center', gap: '6px' }}>
-                <Eye size={14} color="var(--accent)" /> {post.views} views
-              </span>
-            </div>
-            
-            {/* Post Content */}
-            <div data-color-mode="dark" style={{ marginBottom: '60px' }}>
-              <MDEditor.Markdown 
-                source={post.content || ''} 
-                style={{ 
-                  background: 'transparent', 
-                  color: 'var(--text)', 
-                  fontSize: '1.05rem', 
-                  lineHeight: 1.9,
-                  fontFamily: 'inherit'
-                }}
-              />
-            </div>
-
-            {/* Share / Footer Row */}
-            <div style={{ 
-              display: 'flex', justifyContent: 'space-between', alignItems: 'center', 
-              paddingTop: '25px', borderTop: '1px dashed var(--border)',
-              flexWrap: 'wrap', gap: '20px'
-            }}>
-              <div style={{ display: 'flex', alignItems: 'center', gap: '10px', fontSize: '0.85rem', fontFamily: 'Share Tech Mono', color: 'var(--accent)' }}>
-                <span className="blink">_</span> EOF
-              </div>
-              
-              <div style={{ display: 'flex', alignItems: 'center', gap: '15px' }}>
-                <span style={{ fontSize: '0.8rem', fontFamily: 'Share Tech Mono', color: 'var(--text-dim)' }}>SHARE:</span>
-                <button onClick={copyLink} style={{ background: 'transparent', border: 'none', color: 'var(--text)', cursor: 'pointer', display: 'flex' }} title="Copy Link">
-                  <LinkIcon size={18} />
-                </button>
-                <a href={`https://twitter.com/intent/tweet?text=${encodeURIComponent(post.title)}&url=${encodeURIComponent(window.location.href)}`} target="_blank" rel="noreferrer" style={{ color: 'var(--text)' }} title="Share on Twitter">
-                  <Twitter size={18} />
-                </a>
-                <a href={`https://www.linkedin.com/sharing/share-offsite/?url=${encodeURIComponent(window.location.href)}`} target="_blank" rel="noreferrer" style={{ color: 'var(--text)' }} title="Share on LinkedIn">
-                  <Linkedin size={18} />
-                </a>
-              </div>
-            </div>
-
+          <div className="blog-content-wrapper" style={{ fontSize: '1.125rem', lineHeight: 1.8, color: 'var(--text-main)' }}>
+            <MDEditor.Markdown 
+              source={post.content || ''} 
+              style={{ 
+                background: 'transparent', 
+                color: 'inherit',
+                fontFamily: 'var(--font-sans)'
+              }}
+            />
           </div>
+
+          <div style={{ display: 'flex', justifyContent: 'space-between', alignItems: 'center', marginTop: '64px', paddingTop: '32px', borderTop: '1px solid var(--border)', flexWrap: 'wrap', gap: '20px' }}>
+            <div style={{ display: 'flex', alignItems: 'center', gap: '16px' }}>
+              <button 
+                onClick={() => handleInteraction('like')}
+                style={{ display: 'flex', alignItems: 'center', gap: '8px', background: 'transparent', border: 'none', color: userAction === 'like' ? 'var(--text-main)' : 'var(--text-muted)', cursor: 'pointer', transition: 'color 0.3s' }}
+              >
+                <ThumbsUp size={20} className={userAction === 'like' ? 'fill-current' : ''} />
+                <span style={{ fontSize: '0.875rem' }}>{likes}</span>
+              </button>
+              <button 
+                onClick={() => handleInteraction('dislike')}
+                style={{ display: 'flex', alignItems: 'center', gap: '8px', background: 'transparent', border: 'none', color: userAction === 'dislike' ? 'var(--text-main)' : 'var(--text-muted)', cursor: 'pointer', transition: 'color 0.3s' }}
+              >
+                <ThumbsDown size={20} className={userAction === 'dislike' ? 'fill-current' : ''} />
+                <span style={{ fontSize: '0.875rem' }}>{dislikes}</span>
+              </button>
+            </div>
+            
+            <div style={{ display: 'flex', alignItems: 'center', gap: '24px' }}>
+              <span style={{ fontSize: '0.75rem', color: 'var(--text-muted)', textTransform: 'uppercase', letterSpacing: '0.05em' }}>{t('blog.share') || 'Share'}</span>
+              <button onClick={copyLink} style={{ background: 'transparent', border: 'none', color: 'var(--text-main)', cursor: 'pointer', display: 'flex', opacity: 0.7, transition: 'opacity 0.3s' }} onMouseOver={e=>e.currentTarget.style.opacity=1} onMouseOut={e=>e.currentTarget.style.opacity=0.7} title="Copy Link">
+                <LinkIcon size={20} />
+              </button>
+              <a href={`https://twitter.com/intent/tweet?text=${encodeURIComponent(post.title)}&url=${encodeURIComponent(window.location.href)}`} target="_blank" rel="noreferrer" style={{ color: 'var(--text-main)', opacity: 0.7, transition: 'opacity 0.3s' }} onMouseOver={e=>e.currentTarget.style.opacity=1} onMouseOut={e=>e.currentTarget.style.opacity=0.7} title="Share on Twitter">
+                <Twitter size={20} />
+              </a>
+              <a href={`https://www.linkedin.com/sharing/share-offsite/?url=${encodeURIComponent(window.location.href)}`} target="_blank" rel="noreferrer" style={{ color: 'var(--text-main)', opacity: 0.7, transition: 'opacity 0.3s' }} onMouseOver={e=>e.currentTarget.style.opacity=1} onMouseOut={e=>e.currentTarget.style.opacity=0.7} title="Share on LinkedIn">
+                <Linkedin size={20} />
+              </a>
+            </div>
+          </div>
+
         </article>
       </div>
     </section>

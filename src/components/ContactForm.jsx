@@ -1,7 +1,13 @@
 import React, { useState } from 'react';
 import { useTranslation } from 'react-i18next';
+import emailjs from '@emailjs/browser';
 import { supabase, isSupabaseConfigured } from '../lib/supabaseClient';
-import { Linkedin, Github, Mail, MapPin } from 'lucide-react';
+import { Linkedin, Github, Mail, MapPin, Send } from 'lucide-react';
+
+const EMAILJS_SERVICE  = import.meta.env.VITE_EMAILJS_SERVICE_ID  || '';
+const EMAILJS_TEMPLATE = import.meta.env.VITE_EMAILJS_TEMPLATE_ID || '';
+const EMAILJS_KEY      = import.meta.env.VITE_EMAILJS_PUBLIC_KEY  || '';
+const EMAIL_CONFIGURED = EMAILJS_SERVICE && EMAILJS_TEMPLATE && EMAILJS_KEY;
 
 export default function ContactForm() {
   const { t } = useTranslation();
@@ -13,30 +19,42 @@ export default function ContactForm() {
   const handleSubmit = async (e) => {
     e.preventDefault();
     setStatus({ submitting: true, success: false, error: null });
+
     try {
-      if (!isSupabaseConfigured) {
-        setTimeout(() => {
-          setStatus({ submitting: false, success: true, error: null });
-          setFormData({ name: '', email: '', message: '' });
-        }, 1000);
-        return;
+      // 1. Save to Supabase
+      if (isSupabaseConfigured) {
+        await supabase.from('messages').insert([formData]);
       }
-      const { error } = await supabase.from('messages').insert([formData]);
-      if (error) throw error;
+
+      // 2. Send email notification via EmailJS
+      if (EMAIL_CONFIGURED) {
+        await emailjs.send(
+          EMAILJS_SERVICE,
+          EMAILJS_TEMPLATE,
+          {
+            name:    formData.name,
+            email:   formData.email,
+            message: formData.message,
+            time:    new Date().toLocaleString('uz-UZ')
+          },
+          EMAILJS_KEY
+        );
+      }
+
       setStatus({ submitting: false, success: true, error: null });
       setFormData({ name: '', email: '', message: '' });
+      setTimeout(() => setStatus({ submitting: false, success: false, error: null }), 5000);
     } catch (err) {
       console.error(err);
-      setStatus({ submitting: false, success: false, error: "Failed to send message." });
+      setStatus({ submitting: false, success: false, error: 'Failed to send message.' });
     }
   };
 
   return (
-    <section id="contact" style={{ background: 'rgba(0,20,40,0.3)' }}>
+    <section id="contact">
       <div className="section-header">
-        <span className="section-num">// 06</span>
+        <div className="section-eyebrow">06 — Contact</div>
         <h2 className="section-title">{t('contact.title')}</h2>
-        <div className="section-line"></div>
       </div>
       <div className="contact-grid">
         <div className="contact-info">
@@ -52,14 +70,26 @@ export default function ContactForm() {
             <a href="mailto:joxacybers@proton.me" className="contact-link">
               <span className="contact-link-icon"><Mail size={20} /></span> joxacybers@proton.me
             </a>
+            <a href="https://t.me/joxacybers" target="_blank" rel="noreferrer" className="contact-link">
+              <span className="contact-link-icon"><Send size={20} /></span> t.me/joxacybers
+            </a>
             <a href="#contact" className="contact-link">
               <span className="contact-link-icon"><MapPin size={20} /></span> Termez, Uzbekistan
             </a>
           </div>
         </div>
-        
+
         <form className="contact-form" onSubmit={handleSubmit}>
-          {status.success && <div style={{ color: 'var(--accent)', fontFamily: 'Share Tech Mono' }}>{t('contact.success')}</div>}
+          {status.success && (
+            <div style={{ color: 'var(--green)', padding: '12px 16px', borderRadius: '8px', border: '1px solid rgba(34,197,94,0.3)', background: 'rgba(34,197,94,0.08)', fontSize: '0.9rem' }}>
+              ✓ {t('contact.success')}
+            </div>
+          )}
+          {status.error && (
+            <div style={{ color: 'var(--red)', padding: '12px 16px', borderRadius: '8px', border: '1px solid rgba(239,68,68,0.3)', background: 'rgba(239,68,68,0.08)', fontSize: '0.9rem' }}>
+              ✗ {status.error}
+            </div>
+          )}
           <div className="form-group">
             <label className="form-label">{t('contact.name')}</label>
             <input type="text" name="name" className="form-input" placeholder="John Doe" value={formData.name} onChange={handleChange} required />

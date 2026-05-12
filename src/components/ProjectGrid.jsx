@@ -56,9 +56,9 @@ export default function ProjectGrid() {
 
   if (loading) {
     return (
-      <section id="projects" style={{ background: 'rgba(0,20,40,0.3)', padding: '60px 0' }}>
-         <div style={{ textAlign: 'center', fontFamily: 'Share Tech Mono', color: 'var(--accent)' }}>
-           Loading payload...
+      <section id="projects">
+         <div style={{ textAlign: 'center', color: 'var(--text-muted)' }}>
+           Loading projects...
          </div>
       </section>
     );
@@ -66,43 +66,29 @@ export default function ProjectGrid() {
 
   if (errorMsg || projects.length === 0) {
     return (
-      <section id="projects" style={{ background: 'rgba(0,20,40,0.3)' }}>
+      <section id="projects">
         <div className="section-header">
-          <span className="section-num">// 04</span>
+          <div className="section-eyebrow">04 — Projects</div>
           <h2 className="section-title">{t('projects.title')}</h2>
-          <div className="section-line"></div>
         </div>
-        <div className="container" style={{ maxWidth: '800px', margin: '0 auto' }}>
-          <div className="about-terminal" style={{ margin: '0 auto' }}>
-            <div className="terminal-bar">
-              <div className="dot red"></div>
-              <div className="dot yellow"></div>
-              <div className="dot green"></div>
-              <span className="terminal-title">status.sh</span>
+        <div style={{ textAlign: 'center', padding: '40px', color: 'var(--text-muted)' }}>
+          {errorMsg ? (
+            <div style={{ color: 'var(--red)' }}>
+              ERROR: {errorMsg} — {t('projects.error')}
             </div>
-            <div className="terminal-body" style={{ textAlign: 'center', padding: '40px' }}>
-              {errorMsg ? (
-                <div className="t-out highlight" style={{ color: 'var(--accent3)' }}>
-                  ERROR: {errorMsg} — {t('projects.error')}
-                </div>
-              ) : (
-                <div className="t-out" style={{ color: 'var(--text-dim)', fontSize: '1.05rem' }}>
-                  <span className="blink">_</span> {t('projects.empty')}
-                </div>
-              )}
-            </div>
-          </div>
+          ) : (
+            <div>{t('projects.empty')}</div>
+          )}
         </div>
       </section>
     );
   }
 
   return (
-    <section id="projects" style={{ background: 'rgba(0,20,40,0.3)' }}>
+    <section id="projects">
       <div className="section-header">
-        <span className="section-num">// 04</span>
+        <div className="section-eyebrow">04 — Projects</div>
         <h2 className="section-title">{t('projects.title')}</h2>
-        <div className="section-line"></div>
       </div>
       <div className="projects-grid">
         {projects.map((p, i) => {

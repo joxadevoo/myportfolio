@@ -1,47 +1,74 @@
-import React from 'react';
+import React, { useState, useEffect } from 'react';
 import { useTranslation } from 'react-i18next';
+import { supabase, isSupabaseConfigured } from '../lib/supabaseClient';
+
+const typeWords = ['Full-Stack Developer', 'Cybersecurity Student', 'Open Source Contributor'];
 
 export default function Hero() {
   const { t } = useTranslation();
-  const [text, setText] = React.useState('');
-  const [wordIndex, setWordIndex] = React.useState(0);
-  const [isDeleting, setIsDeleting] = React.useState(false);
+  const [text, setText] = useState('');
+  const [wordIndex, setWordIndex] = useState(0);
+  const [isDeleting, setIsDeleting] = useState(false);
+  const [stats, setStats] = useState({ certificates: '6+', projects: '10+', years: '3+' });
 
-  const typeWords = ["Jaxongir", "Joxacybers"];
-
-  React.useEffect(() => {
+  useEffect(() => {
     const currentWord = typeWords[wordIndex % typeWords.length];
-    let waitTime = isDeleting ? 80 : 200;
-    if (!isDeleting && text === currentWord) { waitTime = 2500; setIsDeleting(true); }
-    else if (isDeleting && text === '') { setIsDeleting(false); setWordIndex(p => p + 1); waitTime = 500; }
-    const timeout = setTimeout(() => {
+    let waitTime = isDeleting ? 60 : 150;
+    if (!isDeleting && text === currentWord) { waitTime = 2200; setIsDeleting(true); }
+    else if (isDeleting && text === '') { setIsDeleting(false); setWordIndex(p => p + 1); waitTime = 400; }
+    const t2 = setTimeout(() => {
       setText(currentWord.substring(0, text.length + (isDeleting ? -1 : 1)));
     }, waitTime);
-    return () => clearTimeout(timeout);
+    return () => clearTimeout(t2);
   }, [text, isDeleting, wordIndex]);
+
+  useEffect(() => {
+    async function fetchStats() {
+      if (!isSupabaseConfigured) return;
+      const [certsRes, projectsRes] = await Promise.all([
+        supabase.from('certifications').select('id', { count: 'exact', head: true }),
+        supabase.from('projects').select('id', { count: 'exact', head: true }),
+      ]);
+      setStats({
+        certificates: certsRes.count > 0 ? certsRes.count + '+' : '6+',
+        projects: projectsRes.count > 0 ? projectsRes.count + '+' : '10+',
+        years: '3+',
+      });
+    }
+    fetchStats();
+  }, []);
 
   return (
     <section className="hero" id="home">
-      <div className="hero-orb"></div>
-      <div className="hero-orb2"></div>
       <div className="hero-content">
-        <div className="hero-tag fade-in">{t('hero.tag')}</div>
-        <h1 className="fade-in" style={{ display: 'flex', flexWrap: 'wrap', gap: '15px', alignItems: 'center' }}>
-          <div className="name">{t('hero.iam')}</div>
-          <div className="accent" style={{ color: 'var(--accent)', minWidth: '280px' }}>
-            {text}<span className="blink" style={{ fontWeight: '400', opacity: 0.7 }}>_</span>
-          </div>
+        <div className="hero-badge fade-in">Available for opportunities</div>
+
+        <h1 className="fade-in">
+          Hi, I'm <span className="accent">Jaxongir</span><br />
+          {text}<span className="blink" style={{ color: 'var(--accent)', fontWeight: 300 }}>|</span>
         </h1>
-        <div className="hero-subtitle fade-in">{t('hero.subtitle')}</div>
+
+        <p className="hero-subtitle fade-in">{t('hero.subtitle')}</p>
         <p className="hero-desc fade-in">{t('hero.desc')}</p>
+
         <div className="hero-btns fade-in">
           <a href="#projects" className="btn-primary">{t('hero.viewProjects')}</a>
           <a href="#contact" className="btn-secondary">{t('hero.contactMe')}</a>
         </div>
+
         <div className="hero-stats fade-in">
-          <div><div className="stat-num">6+</div><div className="stat-label">{t('hero.certificates')}</div></div>
-          <div><div className="stat-num">10+</div><div className="stat-label">{t('hero.projects')}</div></div>
-          <div><div className="stat-num">3+</div><div className="stat-label">{t('hero.yearsLearning')}</div></div>
+          <div>
+            <div className="stat-num">{stats.certificates}</div>
+            <div className="stat-label">{t('hero.certificates')}</div>
+          </div>
+          <div>
+            <div className="stat-num">{stats.projects}</div>
+            <div className="stat-label">{t('hero.projects')}</div>
+          </div>
+          <div>
+            <div className="stat-num">{stats.years}</div>
+            <div className="stat-label">{t('hero.yearsLearning')}</div>
+          </div>
         </div>
       </div>
     </section>

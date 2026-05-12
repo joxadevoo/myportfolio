@@ -1,7 +1,7 @@
 import React, { useEffect, useState } from 'react';
 import { Link } from 'react-router-dom';
 import { supabase, isSupabaseConfigured } from '../lib/supabaseClient';
-import { Calendar, Clock } from 'lucide-react';
+import { Calendar, Clock, FileText } from 'lucide-react';
 import { useTranslation } from 'react-i18next';
 
 export default function BlogSection() {
@@ -41,9 +41,9 @@ export default function BlogSection() {
 
   if (loading) {
     return (
-      <section id="blog" style={{ padding: '60px 0' }}>
-         <div style={{ textAlign: 'center', fontFamily: 'Share Tech Mono', color: 'var(--accent)' }}>
-           Loading payload...
+      <section id="blog">
+         <div style={{ textAlign: 'center', color: 'var(--text-muted)' }}>
+           Loading posts...
          </div>
       </section>
     );
@@ -53,30 +53,17 @@ export default function BlogSection() {
     return (
       <section id="blog">
         <div className="section-header">
-          <span className="section-num">// 05</span>
+          <div className="section-eyebrow">05 — Blog</div>
           <h2 className="section-title">{t('blog.title')}</h2>
-          <div className="section-line"></div>
         </div>
-        <div className="container" style={{ maxWidth: '800px', margin: '0 auto' }}>
-          <div className="about-terminal" style={{ margin: '0 auto' }}>
-            <div className="terminal-bar">
-              <div className="dot red"></div>
-              <div className="dot yellow"></div>
-              <div className="dot green"></div>
-              <span className="terminal-title">status.sh</span>
+        <div style={{ textAlign: 'center', padding: '40px', color: 'var(--text-muted)' }}>
+          {errorMsg ? (
+            <div style={{ color: 'var(--red)' }}>
+              ERROR: {errorMsg} — {t('blog.error')}
             </div>
-            <div className="terminal-body" style={{ textAlign: 'center', padding: '40px' }}>
-              {errorMsg ? (
-                <div className="t-out highlight" style={{ color: 'var(--accent3)' }}>
-                  ERROR: {errorMsg} — {t('blog.error')}
-                </div>
-              ) : (
-                <div className="t-out" style={{ color: 'var(--text-dim)', fontSize: '1.05rem' }}>
-                  <span className="blink">_</span> {t('blog.empty')}
-                </div>
-              )}
-            </div>
-          </div>
+          ) : (
+            <div>{t('blog.empty')}</div>
+          )}
         </div>
       </section>
     );
@@ -85,18 +72,19 @@ export default function BlogSection() {
   return (
     <section id="blog">
       <div className="section-header">
-        <span className="section-num">// 05</span>
+        <div className="section-eyebrow">05 — Blog</div>
         <h2 className="section-title">Blog Posts</h2>
-        <div className="section-line"></div>
       </div>
       <div className="blog-grid">
         {posts.map(p => (
-          <Link to={`/blog/${p.id}`} className="blog-card" key={p.id} style={{ display: 'block', textDecoration: 'none' }}>
-            <div className="blog-img" style={{ padding: 0, overflow: 'hidden', minWidth: '80px', height: '80px', borderRadius: '4px' }}>
+          <Link to={`/blog/${p.id}`} className="blog-card" key={p.id}>
+            <div className="blog-img">
               {p.icon && p.icon.startsWith('http') ? (
                 <img src={p.icon} alt={p.title} style={{ width: '100%', height: '100%', objectFit: 'cover' }} />
               ) : (
-                <span style={{ fontSize: '2rem', display: 'flex', alignItems: 'center', justifyContent: 'center', height: '100%' }}>{p.icon || '📝'}</span>
+                <span style={{ display: 'flex', alignItems: 'center', justifyContent: 'center', height: '100%' }}>
+                  <FileText size={32} color="var(--accent)" />
+                </span>
               )}
             </div>
             <div className="blog-body">

@@ -53,7 +53,14 @@
     "empty": "Hech qanday yozuv topilmadi. Blog bazasi hozircha bo'sh.",
     "error": "Ulanish muvaffaqiyatsiz. Tizim texnik xizmatda.",
     "recent": "So'nggi",
-    "readMore": "BATAFSIL O'QISH"
+    "readMore": "BATAFSIL O'QISH",
+    "back": "Maqolalarga qaytish",
+    "loading": "Yuklanmoqda...",
+    "notFound": "Maqola topilmadi.",
+    "minRead": "daq. o'qish",
+    "views": "marta o'qildi",
+    "share": "Ulashish",
+    "linkCopied": "Havola nusxalandi!"
   },
   "contact": {
     "title": "Aloqa",

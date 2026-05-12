@@ -53,7 +53,14 @@
     "empty": "No entries found. Blog database is currently empty.",
     "error": "Connection failed. System undergoing maintenance.",
     "recent": "Recent",
-    "readMore": "READ MORE"
+    "readMore": "READ MORE",
+    "back": "Back to Articles",
+    "loading": "Loading...",
+    "notFound": "Article not found.",
+    "minRead": "min read",
+    "views": "views",
+    "share": "Share",
+    "linkCopied": "Link copied to clipboard!"
   },
   "contact": {
     "title": "Contact",
