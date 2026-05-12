@@ -79,8 +79,8 @@
     "builtWith": "Yaratildi"
   },
   "notFound": {
-    "title": "KRITIK XATO: TUGUN TOPILMADI",
-    "desc": "So'ralgan payload ushbu serverda mavjud emas. Ulanish rad etildi yoki katalog cheklangan.",
-    "back": "ULANISHNI QAYTA BOSHLASH"
+    "title": "Sahifa topilmadi",
+    "desc": "Kechirasiz, siz qidirayotgan sahifa mavjud emas yoki boshqa manzilga ko'chirilgan.",
+    "back": "Bosh sahifaga qaytish"
   }
 }

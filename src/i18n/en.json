@@ -79,8 +79,8 @@
     "builtWith": "Built with"
   },
   "notFound": {
-    "title": "CRITICAL ERROR: NODE NOT FOUND",
-    "desc": "The requested payload does not exist on this server. Connection rejected or directory has been restricted.",
-    "back": "REBOOT CONNECTION"
+    "title": "Page Not Found",
+    "desc": "Sorry, the page you are looking for does not exist or has been moved.",
+    "back": "Return to Home"
   }
 }

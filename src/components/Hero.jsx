@@ -71,6 +71,10 @@ export default function Hero() {
           </div>
         </div>
       </div>
+
+      <div className="hero-image-wrapper fade-in">
+        <img src="/profile.jpg" alt="Jaxongir" className="hero-image" />
+      </div>
     </section>
   );
 }

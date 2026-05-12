@@ -92,7 +92,7 @@ function App() {
         </div>
 
         {/* Mobile */}
-        <div style={{ display: 'flex', gap: '10px', alignItems: 'center' }}>
+        <div className="nav-right-mobile">
           <ThemeToggle />
           <button
             className={`hamburger ${menuOpen ? 'open' : ''}`}
