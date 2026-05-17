@@ -19,6 +19,15 @@ const initialHomeForm = {
   competencies: ''
 };
 
+const initialStats = {
+  totalViews: 0,
+  todayViews: 0,
+  uniqueVisitors: 0,
+  blogReads: 0,
+  topPages: [],
+  recentViews: []
+};
+
 const skillIcons = ['Shield', 'Terminal', 'Code', 'Database', 'Activity', 'ShieldAlert', 'Wifi', 'Lock', 'Globe', 'Server', 'Eye', 'Cpu'];
 const certIcons = ['Award', 'Lock', 'Globe', 'ClipboardCheck', 'Shield', 'Star', 'BookOpen', 'CheckCircle'];
 
@@ -39,6 +48,7 @@ export default function AdminPanel() {
   const [postsList, setPostsList] = useState([]);
   const [skillsList, setSkillsList] = useState([]);
   const [certsList, setCertsList] = useState([]);
+  const [stats, setStats] = useState(initialStats);
 
   const [editingProjectId, setEditingProjectId] = useState(null);
   const [editingPostId, setEditingPostId] = useState(null);
@@ -142,13 +152,56 @@ export default function AdminPanel() {
     }
   }, []);
 
+  const fetchStats = useCallback(async () => {
+    const startOfToday = new Date();
+    startOfToday.setHours(0, 0, 0, 0);
+
+    const [totalViews, todayViews, blogReads, recentViews] = await Promise.all([
+      supabase.from('page_views').select('id', { count: 'exact', head: true }),
+      supabase.from('page_views').select('id', { count: 'exact', head: true }).gte('created_at', startOfToday.toISOString()),
+      supabase.from('page_views').select('id', { count: 'exact', head: true }).eq('page_type', 'blog_post'),
+      supabase
+        .from('page_views')
+        .select('path,page_type,content_id,visitor_id,created_at')
+        .order('created_at', { ascending: false })
+        .limit(500)
+    ]);
+
+    const firstError = totalViews.error || todayViews.error || blogReads.error || recentViews.error;
+    if (firstError) {
+      setStatus({ type: 'error', msg: `ERROR: ${firstError.message}` });
+      return;
+    }
+
+    const recent = recentViews.data || [];
+    const uniqueVisitors = new Set(recent.map(view => view.visitor_id).filter(Boolean)).size;
+    const pageCounts = recent.reduce((acc, view) => {
+      acc[view.path] = (acc[view.path] || 0) + 1;
+      return acc;
+    }, {});
+    const topPages = Object.entries(pageCounts)
+      .map(([path, count]) => ({ path, count }))
+      .sort((a, b) => b.count - a.count)
+      .slice(0, 6);
+
+    setStats({
+      totalViews: totalViews.count || 0,
+      todayViews: todayViews.count || 0,
+      uniqueVisitors,
+      blogReads: blogReads.count || 0,
+      topPages,
+      recentViews: recent.slice(0, 10)
+    });
+  }, []);
+
   const loadTabData = useCallback((tab) => {
     if (tab === 'home') fetchHome();
     if (tab === 'project') fetchProjects();
     if (tab === 'post') fetchPosts();
     if (tab === 'skill') fetchSkills();
     if (tab === 'cert') fetchCerts();
-  }, [fetchHome, fetchProjects, fetchPosts, fetchSkills, fetchCerts]);
+    if (tab === 'stats') fetchStats();
+  }, [fetchHome, fetchProjects, fetchPosts, fetchSkills, fetchCerts, fetchStats]);
 
   useEffect(() => {
     if (!auth && inputRef.current) {
@@ -597,6 +650,7 @@ export default function AdminPanel() {
           <button type="button" onClick={() => switchTab('post')} className={`admin-tab ${activeTab === 'post' ? 'active' : ''}`}>BLOG POSTS</button>
           <button type="button" onClick={() => switchTab('skill')} className={`admin-tab ${activeTab === 'skill' ? 'active' : ''}`}>SKILLS</button>
           <button type="button" onClick={() => switchTab('cert')} className={`admin-tab ${activeTab === 'cert' ? 'active' : ''}`}>CERTS</button>
+          <button type="button" onClick={() => switchTab('stats')} className={`admin-tab ${activeTab === 'stats' ? 'active' : ''}`}>STATS</button>
         </div>
 
         <div className="admin-panel">
@@ -667,6 +721,48 @@ export default function AdminPanel() {
                   <button type="submit" className="admin-submit">SAVE HOME INFO</button>
                   <button type="button" onClick={fetchHome} className="admin-cancel">RELOAD FROM SUPABASE</button>
                 </form>
+              </div>
+            )}
+
+            {activeTab === 'stats' && (
+              <div className="admin-management-grid single">
+                <div className="admin-editor-card">
+                  <ListHeader title="SITE STATISTICS" onRefresh={fetchStats} />
+                  <div className="stats-grid">
+                    <StatCard label="Total page views" value={stats.totalViews} />
+                    <StatCard label="Today views" value={stats.todayViews} />
+                    <StatCard label="Unique visitors" value={stats.uniqueVisitors} hint="last 500 views" />
+                    <StatCard label="Blog reads" value={stats.blogReads} />
+                  </div>
+
+                  <div className="stats-columns">
+                    <div>
+                      <div className="admin-form-section-title">Top pages</div>
+                      <div className="stats-list">
+                        {stats.topPages.length === 0 && <div className="stats-empty">No visits yet.</div>}
+                        {stats.topPages.map(page => (
+                          <div key={page.path} className="stats-row">
+                            <span>{page.path}</span>
+                            <strong>{page.count}</strong>
+                          </div>
+                        ))}
+                      </div>
+                    </div>
+
+                    <div>
+                      <div className="admin-form-section-title">Recent visits</div>
+                      <div className="stats-list">
+                        {stats.recentViews.length === 0 && <div className="stats-empty">No recent visits.</div>}
+                        {stats.recentViews.map((view, index) => (
+                          <div key={`${view.created_at}-${index}`} className="stats-row">
+                            <span>{view.path}</span>
+                            <strong>{new Date(view.created_at).toLocaleDateString('uz-UZ')}</strong>
+                          </div>
+                        ))}
+                      </div>
+                    </div>
+                  </div>
+                </div>
               </div>
             )}
 
@@ -896,6 +992,16 @@ export default function AdminPanel() {
         </div>
       </div>
     </section>
+  );
+}
+
+function StatCard({ label, value, hint }) {
+  return (
+    <div className="stats-card">
+      <div className="stats-value">{value}</div>
+      <div className="stats-label">{label}</div>
+      {hint && <div className="stats-hint">{hint}</div>}
+    </div>
   );
 }
 

@@ -4,6 +4,7 @@ import { useTranslation } from 'react-i18next';
 import Home from './pages/Home';
 import NotFound from './pages/NotFound';
 import { Sun, Moon } from 'lucide-react';
+import { trackPageView } from './lib/analytics';
 
 const BlogPost = React.lazy(() => import('./pages/BlogPost'));
 const AdminPanel = React.lazy(() => import('./pages/AdminPanel'));
@@ -58,6 +59,10 @@ function App() {
   const { pathname } = useLocation();
   const { t } = useTranslation();
   const [menuOpen, setMenuOpen] = useState(false);
+
+  useEffect(() => {
+    trackPageView(pathname);
+  }, [pathname]);
 
   const navLinks = pathname === '/'
     ? [
