@@ -6,6 +6,9 @@ import { emptyHomeSettings, fetchHomeSettings } from '../lib/siteSettings';
 export default function About() {
   const { t } = useTranslation();
   const [about, setAbout] = useState(emptyHomeSettings.about);
+  const aboutParagraphs = ['p1', 'p2', 'p3', 'p4', 'p5', 'p6']
+    .map(key => t(`about.${key}`))
+    .filter(text => text && !text.startsWith('about.'));
 
   useEffect(() => {
     async function loadAbout() {
@@ -25,14 +28,26 @@ export default function About() {
       <div className="section-header">
         <div className="section-eyebrow">01 - About</div>
         <h2 className="section-title">{t('about.title')}</h2>
-        <p className="section-desc">{t('about.p1')}</p>
       </div>
 
       <div className="about-grid">
         <div className="about-text">
-          <p>{t('about.p1')}</p>
-          <p>{t('about.p2')}</p>
-          <div className="about-info">
+          {aboutParagraphs.map(paragraph => (
+            <p key={paragraph}>{paragraph}</p>
+          ))}
+        </div>
+
+        <div className="about-card">
+          <h3 style={{ display: 'flex', alignItems: 'center', gap: '8px' }}>
+            <Zap size={18} color="var(--accent)" /> Core Competencies
+          </h3>
+          <div className="about-skill-list">
+            {about.competencies.map(skill => (
+              <div key={skill} className="about-skill-item">{skill}</div>
+            ))}
+          </div>
+
+          <div className="about-info about-info-card">
             <div className="info-item">
               <div className="info-label">{t('about.location')}</div>
               <div className="info-value" style={{ display: 'flex', alignItems: 'center', gap: '6px' }}>
@@ -51,17 +66,6 @@ export default function About() {
               <div className="info-label">{t('about.languages')}</div>
               <div className="info-value">{about.languages || '-'}</div>
             </div>
-          </div>
-        </div>
-
-        <div className="about-card">
-          <h3 style={{ display: 'flex', alignItems: 'center', gap: '8px' }}>
-            <Zap size={18} color="var(--accent)" /> Core Competencies
-          </h3>
-          <div className="about-skill-list">
-            {about.competencies.map(skill => (
-              <div key={skill} className="about-skill-item">{skill}</div>
-            ))}
           </div>
         </div>
       </div>
