@@ -15,36 +15,20 @@ const iconStyle = { color: 'var(--accent)' };
 export default function Skills() {
   const { t } = useTranslation();
   const [skills, setSkills] = useState([]);
-  const [loading, setLoading] = useState(true);
 
   useEffect(() => {
     async function fetch() {
-      const fallbackSkills = [
-        { name: "Network Security", percent: 90, icon: "Shield" },
-        { name: "Linux Admin", percent: 85, icon: "Terminal" },
-        { name: "Python Scripting", percent: 80, icon: "Code" },
-        { name: "Databases (SQL)", percent: 75, icon: "Database" },
-        { name: "SIEM Tools", percent: 70, icon: "Activity" },
-        { name: "Vulnerability Assessment", percent: 65, icon: "Eye" }
-      ];
-
       if (!isSupabaseConfigured) { 
-        setSkills(fallbackSkills); 
-        setLoading(false); 
+        setSkills([]);
         return; 
       }
       
       try {
         const { data, error } = await supabase.from('skills').select('*').order('sort_order', { ascending: true });
-        if (error || !data || data.length === 0) {
-          setSkills(fallbackSkills);
-        } else {
-          setSkills(data);
-        }
-      } catch (err) {
-        setSkills(fallbackSkills);
-      } finally {
-        setLoading(false);
+        if (error) throw error;
+        setSkills(data || []);
+      } catch {
+        setSkills([]);
       }
     }
     fetch();
@@ -53,7 +37,7 @@ export default function Skills() {
   return (
     <section id="skills">
       <div className="section-header">
-        <div className="section-eyebrow">02 — Skills</div>
+        <div className="section-eyebrow">02 - Skills</div>
         <h2 className="section-title">{t('skills.title')}</h2>
       </div>
       <div className="skills-grid">

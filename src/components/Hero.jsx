@@ -1,6 +1,6 @@
 import React, { useState, useEffect } from 'react';
 import { useTranslation } from 'react-i18next';
-import { supabase, isSupabaseConfigured } from '../lib/supabaseClient';
+import { emptyHomeSettings, fetchHomeSettings } from '../lib/siteSettings';
 
 const typeWords = ['Full-Stack Developer', 'Cybersecurity Student', 'Open Source Contributor'];
 
@@ -9,31 +9,41 @@ export default function Hero() {
   const [text, setText] = useState('');
   const [wordIndex, setWordIndex] = useState(0);
   const [isDeleting, setIsDeleting] = useState(false);
-  const [stats, setStats] = useState({ certificates: '6+', projects: '10+', years: '3+' });
+  const [stats, setStats] = useState(emptyHomeSettings.stats);
 
   useEffect(() => {
     const currentWord = typeWords[wordIndex % typeWords.length];
     let waitTime = isDeleting ? 60 : 150;
-    if (!isDeleting && text === currentWord) { waitTime = 2200; setIsDeleting(true); }
-    else if (isDeleting && text === '') { setIsDeleting(false); setWordIndex(p => p + 1); waitTime = 400; }
+
+    if (!isDeleting && text === currentWord) waitTime = 2200;
+    if (isDeleting && text === '') waitTime = 400;
+
     const t2 = setTimeout(() => {
+      if (!isDeleting && text === currentWord) {
+        setIsDeleting(true);
+        return;
+      }
+
+      if (isDeleting && text === '') {
+        setIsDeleting(false);
+        setWordIndex(p => p + 1);
+        return;
+      }
+
       setText(currentWord.substring(0, text.length + (isDeleting ? -1 : 1)));
     }, waitTime);
+
     return () => clearTimeout(t2);
   }, [text, isDeleting, wordIndex]);
 
   useEffect(() => {
     async function fetchStats() {
-      if (!isSupabaseConfigured) return;
-      const [certsRes, projectsRes] = await Promise.all([
-        supabase.from('certifications').select('id', { count: 'exact', head: true }),
-        supabase.from('projects').select('id', { count: 'exact', head: true }),
-      ]);
-      setStats({
-        certificates: certsRes.count > 0 ? certsRes.count + '+' : '6+',
-        projects: projectsRes.count > 0 ? projectsRes.count + '+' : '10+',
-        years: '3+',
-      });
+      try {
+        const settings = await fetchHomeSettings();
+        setStats(settings.stats);
+      } catch (error) {
+        console.error('Error fetching home stats:', error);
+      }
     }
     fetchStats();
   }, []);
@@ -58,15 +68,15 @@ export default function Hero() {
 
         <div className="hero-stats fade-in">
           <div>
-            <div className="stat-num">{stats.certificates}</div>
+            <div className="stat-num">{stats.certificates || '-'}</div>
             <div className="stat-label">{t('hero.certificates')}</div>
           </div>
           <div>
-            <div className="stat-num">{stats.projects}</div>
+            <div className="stat-num">{stats.projects || '-'}</div>
             <div className="stat-label">{t('hero.projects')}</div>
           </div>
           <div>
-            <div className="stat-num">{stats.years}</div>
+            <div className="stat-num">{stats.years || '-'}</div>
             <div className="stat-label">{t('hero.yearsLearning')}</div>
           </div>
         </div>

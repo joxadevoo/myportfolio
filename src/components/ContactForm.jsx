@@ -8,10 +8,14 @@ const EMAILJS_SERVICE  = import.meta.env.VITE_EMAILJS_SERVICE_ID  || '';
 const EMAILJS_TEMPLATE = import.meta.env.VITE_EMAILJS_TEMPLATE_ID || '';
 const EMAILJS_KEY      = import.meta.env.VITE_EMAILJS_PUBLIC_KEY  || '';
 const EMAIL_CONFIGURED = EMAILJS_SERVICE && EMAILJS_TEMPLATE && EMAILJS_KEY;
+const MAX_NAME_LENGTH = 80;
+const MAX_EMAIL_LENGTH = 160;
+const MAX_MESSAGE_LENGTH = 2000;
 
 export default function ContactForm() {
   const { t } = useTranslation();
   const [formData, setFormData] = useState({ name: '', email: '', message: '' });
+  const [website, setWebsite] = useState('');
   const [status, setStatus] = useState({ submitting: false, success: false, error: null });
 
   const handleChange = (e) => setFormData({ ...formData, [e.target.name]: e.target.value });
@@ -21,9 +25,32 @@ export default function ContactForm() {
     setStatus({ submitting: true, success: false, error: null });
 
     try {
+      if (website.trim()) {
+        setStatus({ submitting: false, success: true, error: null });
+        setFormData({ name: '', email: '', message: '' });
+        setWebsite('');
+        return;
+      }
+
+      const message = {
+        name: formData.name.trim(),
+        email: formData.email.trim(),
+        message: formData.message.trim()
+      };
+
+      if (
+        message.name.length < 2 ||
+        message.email.length > MAX_EMAIL_LENGTH ||
+        message.message.length < 10 ||
+        message.message.length > MAX_MESSAGE_LENGTH
+      ) {
+        throw new Error('Invalid contact message.');
+      }
+
       // 1. Save to Supabase
       if (isSupabaseConfigured) {
-        await supabase.from('messages').insert([formData]);
+        const { error } = await supabase.from('messages').insert([message]);
+        if (error) throw error;
       }
 
       // 2. Send email notification via EmailJS
@@ -32,9 +59,9 @@ export default function ContactForm() {
           EMAILJS_SERVICE,
           EMAILJS_TEMPLATE,
           {
-            name:    formData.name,
-            email:   formData.email,
-            message: formData.message,
+            name:    message.name,
+            email:   message.email,
+            message: message.message,
             time:    new Date().toLocaleString('uz-UZ')
           },
           EMAILJS_KEY
@@ -53,7 +80,7 @@ export default function ContactForm() {
   return (
     <section id="contact">
       <div className="section-header">
-        <div className="section-eyebrow">06 — Contact</div>
+        <div className="section-eyebrow">06 - Contact</div>
         <h2 className="section-title">{t('contact.title')}</h2>
       </div>
       <div className="contact-grid">
@@ -82,25 +109,37 @@ export default function ContactForm() {
         <form className="contact-form" onSubmit={handleSubmit}>
           {status.success && (
             <div style={{ color: 'var(--green)', padding: '12px 16px', borderRadius: '8px', border: '1px solid rgba(34,197,94,0.3)', background: 'rgba(34,197,94,0.08)', fontSize: '0.9rem' }}>
-              ✓ {t('contact.success')}
+              OK: {t('contact.success')}
             </div>
           )}
           {status.error && (
             <div style={{ color: 'var(--red)', padding: '12px 16px', borderRadius: '8px', border: '1px solid rgba(239,68,68,0.3)', background: 'rgba(239,68,68,0.08)', fontSize: '0.9rem' }}>
-              ✗ {status.error}
+              Error: {status.error}
             </div>
           )}
+          <div className="contact-honeypot" aria-hidden="true">
+            <label htmlFor="contact-website">Website</label>
+            <input
+              id="contact-website"
+              type="text"
+              name="website"
+              tabIndex="-1"
+              autoComplete="off"
+              value={website}
+              onChange={e => setWebsite(e.target.value)}
+            />
+          </div>
           <div className="form-group">
             <label className="form-label">{t('contact.name')}</label>
-            <input type="text" name="name" className="form-input" placeholder="John Doe" value={formData.name} onChange={handleChange} required />
+            <input type="text" name="name" className="form-input" placeholder="John Doe" value={formData.name} onChange={handleChange} minLength="2" maxLength={MAX_NAME_LENGTH} autoComplete="name" required />
           </div>
           <div className="form-group">
             <label className="form-label">{t('contact.email')}</label>
-            <input type="email" name="email" className="form-input" placeholder="john@example.com" value={formData.email} onChange={handleChange} required />
+            <input type="email" name="email" className="form-input" placeholder="john@example.com" value={formData.email} maxLength={MAX_EMAIL_LENGTH} autoComplete="email" required onChange={handleChange} />
           </div>
           <div className="form-group">
             <label className="form-label">{t('contact.message')}</label>
-            <textarea name="message" className="form-input" placeholder={t('contact.placeholder')} value={formData.message} onChange={handleChange} required></textarea>
+            <textarea name="message" className="form-input" placeholder={t('contact.placeholder')} value={formData.message} onChange={handleChange} minLength="10" maxLength={MAX_MESSAGE_LENGTH} required></textarea>
           </div>
           <button type="submit" className="btn-primary" style={{ width: 'fit-content' }} disabled={status.submitting}>
             {status.submitting ? t('contact.sending') : t('contact.send')}

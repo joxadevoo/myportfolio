@@ -14,34 +14,20 @@ const iconStyle = { color: 'var(--accent)' };
 export default function Certs() {
   const { t } = useTranslation();
   const [certs, setCerts] = useState([]);
-  const [loading, setLoading] = useState(true);
 
   useEffect(() => {
     async function fetch() {
-      const fallbackCerts = [
-        { title: "Google Cybersecurity", issuer: "Coursera", date: "2024", icon: "Shield" },
-        { title: "CompTIA Security+", issuer: "CompTIA", date: "2023", icon: "Lock" },
-        { title: "Cisco Networking", issuer: "Cisco", date: "2023", icon: "Globe" },
-        { title: "Ethical Hacking Basics", issuer: "Udemy", date: "2022", icon: "Award" }
-      ];
-
       if (!isSupabaseConfigured) { 
-        setCerts(fallbackCerts); 
-        setLoading(false); 
+        setCerts([]);
         return; 
       }
       
       try {
         const { data, error } = await supabase.from('certifications').select('*').order('sort_order', { ascending: true });
-        if (error || !data || data.length === 0) {
-          setCerts(fallbackCerts);
-        } else {
-          setCerts(data);
-        }
-      } catch (err) {
-        setCerts(fallbackCerts);
-      } finally {
-        setLoading(false);
+        if (error) throw error;
+        setCerts(data || []);
+      } catch {
+        setCerts([]);
       }
     }
     fetch();
@@ -50,7 +36,7 @@ export default function Certs() {
   return (
     <section id="certs">
       <div className="section-header">
-        <div className="section-eyebrow">03 — Certifications</div>
+        <div className="section-eyebrow">03 - Certifications</div>
         <h2 className="section-title">{t('certs.title')}</h2>
       </div>
       <div className="cert-grid">

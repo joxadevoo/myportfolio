@@ -3,7 +3,8 @@ import { useParams, Link } from 'react-router-dom';
 import { supabase, isSupabaseConfigured } from '../lib/supabaseClient';
 import { ArrowLeft, Clock, Calendar, Eye, Twitter, Linkedin, Link as LinkIcon, ThumbsUp, ThumbsDown } from 'lucide-react';
 import { useTranslation } from 'react-i18next';
-import MDEditor from '@uiw/react-md-editor';
+import MarkdownPreview from '@uiw/react-markdown-preview/nohighlight';
+import { safeMarkdownUrl } from '../lib/markdownSecurity';
 
 export default function BlogPost() {
   const { id } = useParams();
@@ -20,27 +21,6 @@ export default function BlogPost() {
     async function fetchPost() {
       try {
         if (!isSupabaseConfigured) {
-          const dummyData = [
-            { 
-              id: "1", icon: '🔐', cat: "Network Security", title: "How SQL Injection Attacks Work", 
-              content: "<p>SQL Injection (SQLi) is one of the most dangerous and common vulnerabilities in modern web applications. It occurs when an application improperly parses user-supplied input before executing a SQL query.</p><br/><h3>How It Occurs</h3><p>An attacker can inject a properly crafted SQL statement into text fields. If the application isn't using prepared statements, the database interprets this malicious input as a valid command.</p><br/><h3>Mitigation</h3><p>Always use parameterized queries, utilize ORM security bindings, and sanitize inputs to defend against these vulnerabilities!</p>", 
-              date: "12 Jan 2025", readTime: "5 min read", views: 1240 
-            },
-            { 
-              id: "2", icon: '🐧', cat: "Linux", title: "Linux Commands Every Security Pro Should Know", 
-              content: "<p>The command line is the primary weapon in a security professional's arsenal.</p><br/><h3>Essential Tooling:</h3><p><strong>grep, awk, sed</strong>: For processing massive log files in milliseconds.<br/><br/><strong>nmap / netstat</strong>: For mapping internal ports and routing footprinting.</p><br/><p>Mastering these turns you from a beginner into an efficient analyst.</p>", 
-              date: "04 Feb 2025", readTime: "7 min read", views: 3892 
-            },
-            { 
-              id: "3", icon: '🛡️', cat: "Career", title: "My Journey into Cybersecurity", 
-              content: "<p>Entering the cybersecurity space is daunting, but highly rewarding. It began with an innate curiosity to figure out how websites operated securely.</p><br/><h3>The Turning Point</h3><p>I enrolled in the Google Cybersecurity Certificate program, which laid a foundational understanding of SIEM frameworks.</p><br/><h3>Looking Ahead</h3><p>My goal now is continuous upskilling toward a SOC Analyst position.</p>", 
-              date: "15 Mar 2025", readTime: "4 min read", views: 953 
-            }
-          ];
-          const found = dummyData.find(p => p.id === id);
-          setPost(found);
-          setLikes(found?.likes || 0);
-          setDislikes(found?.dislikes || 0);
           setLoading(false);
           return;
         }
@@ -91,7 +71,7 @@ export default function BlogPost() {
     if (isSupabaseConfigured && post) {
       try {
         await supabase.from('blog_posts').update({ likes: newLikes, dislikes: newDislikes }).eq('id', id);
-      } catch (err) {
+      } catch {
         // Ignore error if columns don't exist yet
       }
     }
@@ -144,8 +124,10 @@ export default function BlogPost() {
           )}
             
           <div className="blog-content-wrapper" style={{ fontSize: '1.125rem', lineHeight: 1.8, color: 'var(--text-main)' }}>
-            <MDEditor.Markdown 
+            <MarkdownPreview
               source={post.content || ''} 
+              skipHtml
+              urlTransform={safeMarkdownUrl}
               style={{ 
                 background: 'transparent', 
                 color: 'inherit',

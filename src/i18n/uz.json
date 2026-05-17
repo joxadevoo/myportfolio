@@ -11,8 +11,8 @@
   "hero": {
     "tag": "Kiberxavfsizlik Mutaxassisi",
     "iam": "Men",
-    "subtitle": "Xavfsizlik Tahlilchisi · Tarmoq Himoyachisi · CTF O'yinchisi",
-    "desc": "Raqamli infratuzilmani himoya qilish va zaifliklарni tajovuzkorlardan oldin aniqlashga ishtiyoqli. Hozirda Google Kiberxavfsizlik Sertifikati dasturida o'qimoqdaman.",
+    "subtitle": "Xavfsizlik Tahlilchisi - Tarmoq Himoyachisi - CTF O'yinchisi",
+    "desc": "Raqamli infratuzilmani himoya qilish va zaifliklarni tajovuzkorlardan oldin aniqlashga ishtiyoqli. Hozirda Google Kiberxavfsizlik Sertifikati dasturida o'qimoqdaman.",
     "viewProjects": "LOYIHALARNI KO'RISH",
     "contactMe": "BOG'LANISH",
     "certificates": "Sertifikatlar",
@@ -65,7 +65,7 @@
   "contact": {
     "title": "Aloqa",
     "heading": "Bog'lanaylik",
-    "desc": "Kiberxavfsizlik, masofaviy ish va hamkorlik bo'yicha imkoniyatlarga occhiqman. Bemalol yozing!",
+    "desc": "Kiberxavfsizlik, masofaviy ish va hamkorlik bo'yicha imkoniyatlarga ochiqman. Bemalol yozing!",
     "name": "Ismingiz",
     "email": "Elektron pochta",
     "message": "Xabar",

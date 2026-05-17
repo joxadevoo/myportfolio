@@ -1,11 +1,20 @@
-import React, { useState, useEffect } from 'react';
+import React, { Suspense, useState, useEffect } from 'react';
 import { Routes, Route, Link, useLocation } from 'react-router-dom';
 import { useTranslation } from 'react-i18next';
 import Home from './pages/Home';
-import BlogPost from './pages/BlogPost';
-import AdminPanel from './pages/AdminPanel';
 import NotFound from './pages/NotFound';
 import { Sun, Moon } from 'lucide-react';
+
+const BlogPost = React.lazy(() => import('./pages/BlogPost'));
+const AdminPanel = React.lazy(() => import('./pages/AdminPanel'));
+
+function PageLoading() {
+  return (
+    <section style={{ minHeight: '100vh', display: 'flex', alignItems: 'center', justifyContent: 'center' }}>
+      <div style={{ color: 'var(--text-muted)' }}>Loading...</div>
+    </section>
+  );
+}
 
 function ThemeToggle() {
   const [dark, setDark] = useState(() => {
@@ -52,12 +61,12 @@ function App() {
 
   const navLinks = pathname === '/'
     ? [
-        { href: '#about',    label: t('nav.about') },
-        { href: '#skills',   label: t('nav.skills') },
-        { href: '#certs',    label: t('nav.certs') },
+        { href: '#about', label: t('nav.about') },
+        { href: '#skills', label: t('nav.skills') },
+        { href: '#certs', label: t('nav.certs') },
         { href: '#projects', label: t('nav.projects') },
-        { href: '#blog',     label: t('nav.blog') },
-        { href: '#contact',  label: t('nav.contact') },
+        { href: '#blog', label: t('nav.blog') },
+        { href: '#contact', label: t('nav.contact') },
       ]
     : [{ href: '/', label: t('nav.back'), isLink: true }];
 
@@ -74,7 +83,6 @@ function App() {
           Joxa<span>.</span>Dev
         </Link>
 
-        {/* Desktop */}
         <div className="nav-right-desktop">
           {pathname === '/' ? (
             <ul>
@@ -91,7 +99,6 @@ function App() {
           <LangToggle />
         </div>
 
-        {/* Mobile */}
         <div className="nav-right-mobile">
           <ThemeToggle />
           <button
@@ -114,18 +121,18 @@ function App() {
       </div>
 
       <Routes>
-        <Route path="/"           element={<Home />} />
-        <Route path="/blog/:id"   element={<BlogPost />} />
-        <Route path="/dora705221" element={<AdminPanel />} />
-        <Route path="*"           element={<NotFound />} />
+        <Route path="/" element={<Home />} />
+        <Route path="/blog/:id" element={<Suspense fallback={<PageLoading />}><BlogPost /></Suspense>} />
+        <Route path="/dora705221" element={<Suspense fallback={<PageLoading />}><AdminPanel /></Suspense>} />
+        <Route path="*" element={<NotFound />} />
       </Routes>
 
       <footer>
         <div className="footer-text">
-          © {new Date().getFullYear()} <span>Jaxongir Toshpolatov</span> — {t('footer.rights')}
+          &copy; {new Date().getFullYear()} <span>Jaxongir Toshpolatov</span> &mdash; {t('footer.rights')}
         </div>
         <div className="footer-text">
-          {t('footer.builtWith')} <span>♥</span> &amp; Supabase
+          {t('footer.builtWith')} <span>&hearts;</span> &amp; Supabase
         </div>
       </footer>
     </>
