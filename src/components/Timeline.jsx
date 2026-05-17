@@ -10,9 +10,9 @@ export default function Timeline() {
     },
     {
       year: "2021 - 2023",
-      title: "Full-Stack Developer",
-      company: "Creative Agency",
-      description: "Built scalable web apps using React, Node.js, and Supabase for diverse clients."
+      title: "Cybersecurity Learner",
+      company: "Self Study",
+      description: "Practiced Linux, networking, web security, and defensive monitoring fundamentals."
     },
     {
       year: "2018 - 2021",

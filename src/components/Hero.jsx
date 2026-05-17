@@ -2,7 +2,7 @@ import React, { useState, useEffect } from 'react';
 import { useTranslation } from 'react-i18next';
 import { emptyHomeSettings, fetchHomeSettings } from '../lib/siteSettings';
 
-const typeWords = ['Full-Stack Developer', 'Cybersecurity Student', 'Open Source Contributor'];
+const typeWords = ['Cybersecurity Student', 'SOC Analyst in Progress', 'Security Engineer Goal'];
 
 export default function Hero() {
   const { t } = useTranslation();

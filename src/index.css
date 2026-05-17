@@ -12,6 +12,9 @@
   --border-hover: rgba(255, 255, 255, 0.15);
   --card-bg: rgba(255, 255, 255, 0.02);
   --card-hover: rgba(255, 255, 255, 0.04);
+  --nav-bg: rgba(10, 10, 10, 0.64);
+  --nav-bg-strong: rgba(10, 10, 10, 0.82);
+  --nav-border: rgba(255, 255, 255, 0.08);
   
   --font-sans: 'Inter', sans-serif;
   --font-display: 'Outfit', sans-serif;
@@ -30,6 +33,9 @@
   --border-hover: rgba(0, 0, 0, 0.15);
   --card-bg: #ffffff;
   --card-hover: #fafafa;
+  --nav-bg: rgba(252, 252, 252, 0.68);
+  --nav-bg-strong: rgba(252, 252, 252, 0.9);
+  --nav-border: rgba(0, 0, 0, 0.08);
 }
 
 * {
@@ -69,23 +75,33 @@ a {
 nav {
   position: fixed;
   top: 0;
+  left: 0;
+  right: 0;
   width: 100%;
   padding: 24px 48px;
   display: flex;
   justify-content: space-between;
   align-items: center;
-  z-index: 100;
-  background: transparent;
-  backdrop-filter: blur(12px);
-  -webkit-backdrop-filter: blur(12px);
-  border-bottom: 1px solid transparent;
+  z-index: 1000;
+  background: var(--nav-bg);
+  backdrop-filter: saturate(180%) blur(18px);
+  -webkit-backdrop-filter: saturate(180%) blur(18px);
+  border-bottom: 1px solid var(--nav-border);
+  box-shadow: 0 1px 24px rgba(0, 0, 0, 0.08);
+  transform: translateZ(0);
   transition: padding var(--transition-smooth), background var(--transition-smooth);
 }
 
 .nav-scrolled {
   padding: 16px 48px;
-  background: rgba(var(--bg), 0.8);
-  border-bottom: 1px solid var(--border);
+  background: var(--nav-bg-strong);
+  border-bottom: 1px solid var(--nav-border);
+}
+
+@supports not ((backdrop-filter: blur(1px)) or (-webkit-backdrop-filter: blur(1px))) {
+  nav {
+    background: var(--nav-bg-strong);
+  }
 }
 
 .nav-logo {
