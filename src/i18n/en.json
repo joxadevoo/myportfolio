@@ -66,6 +66,26 @@
     "share": "Share",
     "linkCopied": "Link copied to clipboard!"
   },
+  "comments": {
+    "title": "Comments",
+    "anonymous": "Anonymous",
+    "open": "Leave a comment",
+    "namePlaceholder": "Your name (optional)",
+    "commentPlaceholder": "Write your comment...",
+    "replyPlaceholder": "Write your reply...",
+    "submit": "LEAVE COMMENT",
+    "submitReply": "LEAVE REPLY",
+    "submitting": "SENDING...",
+    "success": "Comment added.",
+    "error": "Could not send comment. Text must be between 3 and 1200 characters.",
+    "empty": "No comments yet. Be the first to share a thought.",
+    "reply": "Reply",
+    "replied": "Reply",
+    "replyTitle": "Write a reply",
+    "replyingTo": "Replying to:",
+    "cancel": "Cancel",
+    "close": "Close"
+  },
   "contact": {
     "title": "Contact",
     "heading": "Let's Connect",

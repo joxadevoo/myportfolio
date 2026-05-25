@@ -1,10 +1,13 @@
 import React, { useEffect, useState } from 'react';
 import { useParams, Link } from 'react-router-dom';
 import { supabase, isSupabaseConfigured } from '../lib/supabaseClient';
-import { ArrowLeft, Clock, Calendar, Eye, Twitter, Linkedin, Link as LinkIcon, ThumbsUp, ThumbsDown } from 'lucide-react';
+import { ArrowLeft, Clock, Calendar, Eye, Twitter, Linkedin, Link as LinkIcon, ThumbsUp, ThumbsDown, MessageCircle, Reply } from 'lucide-react';
 import { useTranslation } from 'react-i18next';
 import MarkdownPreview from '@uiw/react-markdown-preview/nohighlight';
 import { safeMarkdownUrl } from '../lib/markdownSecurity';
+
+const MAX_COMMENT_NAME_LENGTH = 80;
+const MAX_COMMENT_LENGTH = 1200;
 
 export default function BlogPost() {
   const { id } = useParams();
@@ -14,6 +17,11 @@ export default function BlogPost() {
   const [likes, setLikes] = useState(0);
   const [dislikes, setDislikes] = useState(0);
   const [userAction, setUserAction] = useState(null); // 'like' | 'dislike' | null
+  const [comments, setComments] = useState([]);
+  const [commentForm, setCommentForm] = useState({ name: '', comment: '' });
+  const [commentStatus, setCommentStatus] = useState({ submitting: false, error: null, success: false });
+  const [commentDialogOpen, setCommentDialogOpen] = useState(false);
+  const [replyingTo, setReplyingTo] = useState(null);
 
   useEffect(() => {
     window.scrollTo(0, 0);
@@ -43,6 +51,27 @@ export default function BlogPost() {
       }
     }
     fetchPost();
+  }, [id]);
+
+  useEffect(() => {
+    async function fetchComments() {
+      if (!isSupabaseConfigured) return;
+
+      const { data, error } = await supabase
+        .from('blog_comments')
+        .select('*')
+        .eq('post_id', id)
+        .order('created_at', { ascending: true });
+
+      if (error) {
+        console.error('Error fetching comments:', error);
+        return;
+      }
+
+      setComments(data || []);
+    }
+
+    fetchComments();
   }, [id]);
 
   const copyLink = () => {
@@ -77,6 +106,58 @@ export default function BlogPost() {
     }
   };
 
+  const openCommentDialog = (parentComment = null) => {
+    setReplyingTo(parentComment);
+    setCommentStatus({ submitting: false, error: null, success: false });
+    setCommentDialogOpen(true);
+  };
+
+  const closeCommentDialog = () => {
+    if (commentStatus.submitting) return;
+    setCommentDialogOpen(false);
+    setReplyingTo(null);
+  };
+
+  const handleCommentSubmit = async (e) => {
+    e.preventDefault();
+    setCommentStatus({ submitting: true, error: null, success: false });
+
+    const authorName = commentForm.name.trim() || t('comments.anonymous');
+    const comment = commentForm.comment.trim();
+
+    if (comment.length < 3 || comment.length > MAX_COMMENT_LENGTH) {
+      setCommentStatus({ submitting: false, error: t('comments.error'), success: false });
+      return;
+    }
+
+    try {
+      const payload = {
+        post_id: String(id),
+        author_name: authorName.slice(0, MAX_COMMENT_NAME_LENGTH),
+        comment,
+        parent_id: replyingTo?.id || null
+      };
+
+      const { data, error } = await supabase
+        .from('blog_comments')
+        .insert([payload])
+        .select('*')
+        .single();
+
+      if (error) throw error;
+
+      setComments(prev => [...prev, data]);
+      setCommentForm({ name: '', comment: '' });
+      setCommentStatus({ submitting: false, error: null, success: true });
+      setReplyingTo(null);
+      setCommentDialogOpen(false);
+      setTimeout(() => setCommentStatus({ submitting: false, error: null, success: false }), 3500);
+    } catch (error) {
+      console.error('Error sending comment:', error);
+      setCommentStatus({ submitting: false, error: t('comments.error'), success: false });
+    }
+  };
+
   if (loading) {
     return <section style={{ minHeight: '100vh', display: 'flex', alignItems: 'center', justifyContent: 'center' }}>
       <div style={{ fontSize: '1.25rem', color: 'var(--text-muted)' }}>{t('blog.loading') || 'Loading...'}</div>
@@ -88,6 +169,14 @@ export default function BlogPost() {
       <div style={{ fontSize: '1.25rem', color: 'var(--text-muted)' }}>{t('blog.notFound') || 'Article not found.'}</div>
     </section>;
   }
+
+  const repliesByParent = comments.reduce((acc, comment) => {
+    if (!comment.parent_id) return acc;
+    acc[comment.parent_id] = acc[comment.parent_id] || [];
+    acc[comment.parent_id].push(comment);
+    return acc;
+  }, {});
+  const topLevelComments = comments.filter(comment => !comment.parent_id).reverse();
 
   return (
     <section style={{ minHeight: '100vh', padding: '120px 20px 80px', display: 'flex', justifyContent: 'center' }}>
@@ -167,6 +256,106 @@ export default function BlogPost() {
               </a>
             </div>
           </div>
+
+          <div className="comment-open-row">
+            <button type="button" className="comment-open-button" onClick={() => openCommentDialog()}>
+              <MessageCircle size={18} />
+              <span>{t('comments.open')}</span>
+              <strong>{comments.length}</strong>
+            </button>
+          </div>
+
+          <section className="comments-section">
+            <div className="comments-header">
+              <h2><MessageCircle size={22} /> {t('comments.title')}</h2>
+              <span>{comments.length}</span>
+            </div>
+
+            <div className="comments-list">
+              {comments.length === 0 && <div className="comments-empty">{t('comments.empty')}</div>}
+              {topLevelComments.map(comment => (
+                <article key={comment.id} className="comment-card">
+                  <div className="comment-meta">
+                    <strong>{comment.author_name || t('comments.anonymous')}</strong>
+                    <span>{new Date(comment.created_at).toLocaleDateString('uz-UZ')}</span>
+                  </div>
+                  <p>{comment.comment}</p>
+                  <button type="button" className="comment-reply-button" onClick={() => openCommentDialog(comment)}>
+                    <Reply size={14} />
+                    {t('comments.reply')}
+                  </button>
+                  {repliesByParent[comment.id]?.length > 0 && (
+                    <div className="comment-replies">
+                      {repliesByParent[comment.id].map(reply => (
+                        <article key={reply.id} className="comment-card comment-card-reply">
+                          <div className="comment-reply-indicator">
+                            <Reply size={13} /> {t('comments.replied')}
+                          </div>
+                          <div className="comment-meta">
+                            <strong>{reply.author_name || t('comments.anonymous')}</strong>
+                            <span>{new Date(reply.created_at).toLocaleDateString('uz-UZ')}</span>
+                          </div>
+                          <p>{reply.comment}</p>
+                        </article>
+                      ))}
+                    </div>
+                  )}
+                </article>
+              ))}
+            </div>
+          </section>
+
+          {commentDialogOpen && (
+            <div className="comment-dialog-backdrop" role="presentation" onMouseDown={closeCommentDialog}>
+              <div className="comment-dialog" role="dialog" aria-modal="true" aria-labelledby="comment-dialog-title" onMouseDown={e => e.stopPropagation()}>
+                <div className="comment-dialog-head">
+                  <div>
+                    <div id="comment-dialog-title" className="comment-dialog-title">
+                      <MessageCircle size={20} /> {replyingTo ? t('comments.replyTitle') : t('comments.title')}
+                    </div>
+                    {replyingTo && (
+                      <div className="comment-reply-context">
+                        {t('comments.replyingTo')} <strong>{replyingTo.author_name || t('comments.anonymous')}</strong>
+                      </div>
+                    )}
+                  </div>
+                  <button type="button" className="comment-dialog-close" onClick={closeCommentDialog} aria-label={t('comments.close')}>x</button>
+                </div>
+
+                <form className="comment-form comment-form-dialog" onSubmit={handleCommentSubmit}>
+                  {commentStatus.success && <div className="comment-status success">{t('comments.success')}</div>}
+                  {commentStatus.error && <div className="comment-status error">{commentStatus.error}</div>}
+
+                  <input
+                    type="text"
+                    className="form-input"
+                    value={commentForm.name}
+                    onChange={e => setCommentForm({ ...commentForm, name: e.target.value })}
+                    placeholder={t('comments.namePlaceholder')}
+                    maxLength={MAX_COMMENT_NAME_LENGTH}
+                    autoComplete="name"
+                  />
+                  <textarea
+                    className="form-input"
+                    value={commentForm.comment}
+                    onChange={e => setCommentForm({ ...commentForm, comment: e.target.value })}
+                    placeholder={replyingTo ? t('comments.replyPlaceholder') : t('comments.commentPlaceholder')}
+                    minLength="3"
+                    maxLength={MAX_COMMENT_LENGTH}
+                    required
+                  />
+                  <div className="comment-dialog-actions">
+                    <button type="submit" className="btn-primary" disabled={commentStatus.submitting}>
+                      {commentStatus.submitting ? t('comments.submitting') : replyingTo ? t('comments.submitReply') : t('comments.submit')}
+                    </button>
+                    <button type="button" className="comment-cancel-button" onClick={closeCommentDialog}>
+                      {t('comments.cancel')}
+                    </button>
+                  </div>
+                </form>
+              </div>
+            </div>
+          )}
 
         </article>
       </div>

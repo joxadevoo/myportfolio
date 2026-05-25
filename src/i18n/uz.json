@@ -66,6 +66,26 @@
     "share": "Ulashish",
     "linkCopied": "Havola nusxalandi!"
   },
+  "comments": {
+    "title": "Izohlar",
+    "anonymous": "Anonim",
+    "open": "Izoh qoldirish",
+    "namePlaceholder": "Ismingiz (ixtiyoriy)",
+    "commentPlaceholder": "Izohingizni yozing...",
+    "replyPlaceholder": "Javobingizni yozing...",
+    "submit": "IZOH QOLDIRISH",
+    "submitReply": "JAVOB QOLDIRISH",
+    "submitting": "YUBORILMOQDA...",
+    "success": "Izoh qo'shildi.",
+    "error": "Izoh yuborilmadi. Matn 3-1200 belgi oralig'ida bo'lishi kerak.",
+    "empty": "Hozircha izohlar yo'q. Birinchi bo'lib fikr qoldiring.",
+    "reply": "Javob berish",
+    "replied": "Javob",
+    "replyTitle": "Javob yozish",
+    "replyingTo": "Javob:",
+    "cancel": "Bekor qilish",
+    "close": "Yopish"
+  },
   "contact": {
     "title": "Aloqa",
     "heading": "Bog'lanaylik",
