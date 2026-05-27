@@ -85,7 +85,7 @@ function App() {
           className="nav-logo"
           onClick={() => { window.scrollTo(0, 0); closeMenu(); }}
         >
-          Joxa<span>.</span>Dev
+          JOXACYBERS
         </Link>
 
         <div className="nav-right-desktop">
