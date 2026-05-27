@@ -49,7 +49,7 @@ export default function BlogSection() {
     return (
       <section id="blog">
         <div className="section-header">
-          <div className="section-eyebrow">05 - Blog</div>
+          <div className="section-eyebrow">06 - Blog</div>
           <h2 className="section-title">{t('blog.title')}</h2>
         </div>
         <div style={{ textAlign: 'center', padding: '40px', color: 'var(--text-muted)' }}>
@@ -68,8 +68,8 @@ export default function BlogSection() {
   return (
     <section id="blog">
       <div className="section-header">
-        <div className="section-eyebrow">05 - Blog</div>
-        <h2 className="section-title">Blog Posts</h2>
+        <div className="section-eyebrow">06 - Blog</div>
+        <h2 className="section-title">{t('blog.title')}</h2>
       </div>
       <div className="blog-grid">
         {posts.map(p => (

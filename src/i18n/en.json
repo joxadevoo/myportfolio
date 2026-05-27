@@ -10,9 +10,20 @@
   },
   "hero": {
     "tag": "Cybersecurity Professional",
+    "badge": "Learning in public with hands-on progress",
+    "headlineIntro": "Hi, I'm",
+    "headlineName": "Jaxongir",
+    "headlineRole": "Blue Team / Defensive Security",
+    "greeting": "Hi, I'm",
+    "name": "Jaxongir",
     "iam": "I'm",
-    "subtitle": "Goal: SOC Analyst -> Security Engineer",
-    "desc": "Passionate about protecting digital infrastructure and identifying vulnerabilities before attackers do. Currently advancing through Google Cybersecurity Certificate program.",
+    "roles": [
+      "Cybersecurity Student",
+      "SOC Analyst in Progress",
+      "Digital Defense"
+    ],
+    "subtitle": "Cybersecurity Enthusiast",
+    "desc": "My path started with web development and is moving deeper into cybersecurity. I am learning network security, threat analysis, SIEM tools, and incident response through practical projects.",
     "viewProjects": "VIEW PROJECTS",
     "contactMe": "CONTACT ME",
     "certificates": "Certificates",
@@ -42,14 +53,45 @@
     "siem": "SIEM Tools",
     "incident": "Incident Response"
   },
+  "roadmap": {
+    "title": "My Learning Progress",
+    "status": {
+      "in-progress": "In Progress",
+      "upcoming": "Upcoming"
+    },
+    "steps": [
+      {
+        "title": "Networking",
+        "status": "in-progress",
+        "desc": "Working through TCP/IP, DNS, ports, protocols, and traffic analysis basics with Wireshark."
+      },
+      {
+        "title": "Linux",
+        "status": "in-progress",
+        "desc": "Strengthening terminal usage, permissions, processes, services, and security log fundamentals."
+      },
+      {
+        "title": "SIEM & Log Analysis",
+        "status": "upcoming",
+        "desc": "Next step: analyzing alerts, logs, and suspicious activity with Splunk, Wazuh, or ELK."
+      },
+      {
+        "title": "Incident Response",
+        "status": "upcoming",
+        "desc": "Practicing detection, initial triage, root-cause thinking, and Blue Team response workflows."
+      }
+    ]
+  },
   "certs": {
     "title": "Certifications",
+    "comingSoon": "Coming soon",
     "inProgress": "In Progress",
     "planned": "Planned"
   },
   "projects": {
     "title": "Projects",
-    "empty": "No projects deployed yet. Database is empty.",
+    "comingSoon": "Projects in progress",
+    "viewProject": "VIEW PROJECT",
     "error": "Connection failed. System undergoing maintenance."
   },
   "blog": {

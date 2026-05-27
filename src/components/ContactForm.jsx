@@ -80,7 +80,7 @@ export default function ContactForm() {
   return (
     <section id="contact">
       <div className="section-header">
-        <div className="section-eyebrow">06 - Contact</div>
+        <div className="section-eyebrow">07 - Contact</div>
         <h2 className="section-title">{t('contact.title')}</h2>
       </div>
       <div className="contact-grid">

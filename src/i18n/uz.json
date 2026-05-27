@@ -10,9 +10,20 @@
   },
   "hero": {
     "tag": "Kiberxavfsizlik Mutaxassisi",
+    "badge": "Ochiq o'rganish va amaliy progress",
+    "headlineIntro": "Hi, I'm",
+    "headlineName": "Jaxongir",
+    "headlineRole": "Blue Team / Defensive Security",
+    "greeting": "Salom, men",
+    "name": "Jaxongir",
     "iam": "Men",
-    "subtitle": "Maqsad: SOC Analyst -> Security Engineer",
-    "desc": "Raqamli infratuzilmani himoya qilish va zaifliklarni tajovuzkorlardan oldin aniqlashga ishtiyoqli. Hozirda Google Kiberxavfsizlik Sertifikati dasturida o'qimoqdaman.",
+    "roles": [
+      "Kiberxavfsizlik Talabasi",
+      "SOC Analyst yo'lida",
+      "Raqamli Himoya"
+    ],
+    "subtitle": "Cybersecurity Enthusiast",
+    "desc": "Web dasturlashdan boshlangan yo'lim kiberxavfsizlikka ulanmoqda. Tarmoq xavfsizligi, tahdidlarni tahlil qilish, SIEM vositalari va hodisalarga javob berishni amaliy loyihalar orqali o'rganyapman.",
     "viewProjects": "LOYIHALARNI KO'RISH",
     "contactMe": "BOG'LANISH",
     "certificates": "Sertifikatlar",
@@ -42,14 +53,45 @@
     "siem": "SIEM Vositalari",
     "incident": "Hodisaga Javob"
   },
+  "roadmap": {
+    "title": "Mening O'rganish Progressim",
+    "status": {
+      "in-progress": "O'rganilmoqda",
+      "upcoming": "Tez kunda"
+    },
+    "steps": [
+      {
+        "title": "Networking",
+        "status": "in-progress",
+        "desc": "TCP/IP, DNS, portlar, protokollar va Wireshark orqali trafikni tushunish ustida ishlayapman."
+      },
+      {
+        "title": "Linux",
+        "status": "in-progress",
+        "desc": "Terminal, fayl ruxsatlari, jarayonlar, servislar va xavfsizlik loglari bilan amaliy ishlashni mustahkamlayapman."
+      },
+      {
+        "title": "SIEM & Log Analysis",
+        "status": "upcoming",
+        "desc": "Splunk, Wazuh yoki ELK orqali alertlar, loglar va shubhali harakatlarni tahlil qilish bosqichi."
+      },
+      {
+        "title": "Incident Response",
+        "status": "upcoming",
+        "desc": "Hujumni aniqlash, dastlabki triage, sababni topish va Blue Team jarayonida javob qaytarish amaliyoti."
+      }
+    ]
+  },
   "certs": {
     "title": "Sertifikatlar",
+    "comingSoon": "Tez orada",
     "inProgress": "Jarayonda",
     "planned": "Rejalashtirilgan"
   },
   "projects": {
     "title": "Loyihalar",
-    "empty": "Hech qanday loyiha topilmadi. Baza hozircha bo'sh.",
+    "comingSoon": "Loyihalar tayyorlanmoqda",
+    "viewProject": "LOYIHANI KO'RISH",
     "error": "Ulanish muvaffaqiyatsiz. Tizim texnik xizmatda."
   },
   "blog": {

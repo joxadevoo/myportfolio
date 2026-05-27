@@ -2,39 +2,9 @@ import React, { useState, useEffect } from 'react';
 import { useTranslation } from 'react-i18next';
 import { emptyHomeSettings, fetchHomeSettings } from '../lib/siteSettings';
 
-const typeWords = ['Cybersecurity Student', 'SOC Analyst in Progress', 'Security Engineer Goal'];
-
 export default function Hero() {
   const { t } = useTranslation();
-  const [text, setText] = useState('');
-  const [wordIndex, setWordIndex] = useState(0);
-  const [isDeleting, setIsDeleting] = useState(false);
   const [stats, setStats] = useState(emptyHomeSettings.stats);
-
-  useEffect(() => {
-    const currentWord = typeWords[wordIndex % typeWords.length];
-    let waitTime = isDeleting ? 60 : 150;
-
-    if (!isDeleting && text === currentWord) waitTime = 2200;
-    if (isDeleting && text === '') waitTime = 400;
-
-    const t2 = setTimeout(() => {
-      if (!isDeleting && text === currentWord) {
-        setIsDeleting(true);
-        return;
-      }
-
-      if (isDeleting && text === '') {
-        setIsDeleting(false);
-        setWordIndex(p => p + 1);
-        return;
-      }
-
-      setText(currentWord.substring(0, text.length + (isDeleting ? -1 : 1)));
-    }, waitTime);
-
-    return () => clearTimeout(t2);
-  }, [text, isDeleting, wordIndex]);
 
   useEffect(() => {
     async function fetchStats() {
@@ -51,11 +21,11 @@ export default function Hero() {
   return (
     <section className="hero" id="home">
       <div className="hero-content">
-        <div className="hero-badge fade-in">Available for opportunities</div>
+        <div className="hero-badge fade-in">{t('hero.badge')}</div>
 
         <h1 className="fade-in">
-          Hi, I'm <span className="accent">Jaxongir</span><br />
-          {text}<span className="blink" style={{ color: 'var(--accent)', fontWeight: 300 }}>|</span>
+          {t('hero.headlineIntro')} <span className="accent">{t('hero.headlineName')}</span><br />
+          {t('hero.headlineRole')}
         </h1>
 
         <p className="hero-subtitle fade-in">{t('hero.subtitle')}</p>

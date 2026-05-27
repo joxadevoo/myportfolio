@@ -1,17 +1,15 @@
 import React, { useState, useRef, useEffect, useCallback } from 'react';
 import { supabase, isSupabaseConfigured } from '../lib/supabaseClient';
-import { fetchHomeSettings, normalizeHomeSettings, saveHomeSettings } from '../lib/siteSettings';
+import { DEFAULT_LEARNING_START_DATE, fetchHomeSettings, normalizeHomeSettings, saveHomeSettings } from '../lib/siteSettings';
 import MDEditor from '@uiw/react-md-editor/nohighlight';
 import { safeMarkdownUrl } from '../lib/markdownSecurity';
 
-const initialProjectForm = { title: '', tag: '', description: '', tools: '' };
+const initialProjectForm = { title: '', tag: '', description: '', tools: '', link: '' };
 const initialPostForm = { title: '', cat: '', excerpt: '', content: '', image: '' };
 const initialSkillForm = { name: '', icon: 'Shield', percent: 70, sort_order: 0 };
 const initialCertForm = { title: '', issuer: '', date: '', icon: 'Award', sort_order: 0 };
 const initialHomeForm = {
-  certificates: '',
-  projects: '',
-  years: '',
+  learningStartDate: DEFAULT_LEARNING_START_DATE,
   location: '',
   status: '',
   focus: '',
@@ -137,9 +135,7 @@ export default function AdminPanel() {
     try {
       const settings = await fetchHomeSettings();
       setHomeForm({
-        certificates: settings.stats.certificates,
-        projects: settings.stats.projects,
-        years: settings.stats.years,
+        learningStartDate: settings.stats.learningStartDate || DEFAULT_LEARNING_START_DATE,
         location: settings.about.location,
         status: settings.about.status,
         focus: settings.about.focus,
@@ -307,9 +303,7 @@ export default function AdminPanel() {
     try {
       const payload = normalizeHomeSettings({
         stats: {
-          certificates: homeForm.certificates.trim(),
-          projects: homeForm.projects.trim(),
-          years: homeForm.years.trim()
+          learningStartDate: homeForm.learningStartDate || DEFAULT_LEARNING_START_DATE
         },
         about: {
           location: homeForm.location.trim(),
@@ -341,7 +335,8 @@ export default function AdminPanel() {
       title: projectForm.title,
       tag: projectForm.tag,
       description: projectForm.description,
-      tools: toolsArray
+      tools: toolsArray,
+      link: projectForm.link.trim() || null
     };
 
     const { error } = editingProjectId
@@ -484,7 +479,8 @@ export default function AdminPanel() {
       title: project.title || '',
       tag: project.tag || '',
       description: project.description || '',
-      tools: Array.isArray(project.tools) ? project.tools.join(', ') : project.tools || ''
+      tools: Array.isArray(project.tools) ? project.tools.join(', ') : project.tools || '',
+      link: project.link || ''
     });
   };
 
@@ -677,19 +673,14 @@ export default function AdminPanel() {
             {activeTab === 'home' && (
               <div className="admin-management-grid single">
                 <form className="admin-editor-card" onSubmit={handleHomeSubmit}>
-                  <div className="admin-form-section-title">Hero stats</div>
-                  <div style={{ display: 'grid', gridTemplateColumns: 'repeat(auto-fit, minmax(160px, 1fr))', gap: '18px' }}>
+                  <div className="admin-form-section-title">Auto stats</div>
+                  <div style={{ color: 'var(--text-muted)', fontSize: '0.86rem', lineHeight: 1.7, marginBottom: '18px' }}>
+                    Certificates and projects are counted automatically from Supabase. Learning years are calculated from the start date below and increase by 0.5 every 6 months.
+                  </div>
+                  <div style={{ display: 'grid', gridTemplateColumns: 'repeat(auto-fit, minmax(220px, 1fr))', gap: '18px' }}>
                     <div className="form-group">
-                      <label className="form-label">Certificates</label>
-                      <input type="text" className="form-input" value={homeForm.certificates} onChange={e => setHomeForm({ ...homeForm, certificates: e.target.value })} placeholder="6+" />
-                    </div>
-                    <div className="form-group">
-                      <label className="form-label">Projects</label>
-                      <input type="text" className="form-input" value={homeForm.projects} onChange={e => setHomeForm({ ...homeForm, projects: e.target.value })} placeholder="10+" />
-                    </div>
-                    <div className="form-group">
-                      <label className="form-label">Years Learning</label>
-                      <input type="text" className="form-input" value={homeForm.years} onChange={e => setHomeForm({ ...homeForm, years: e.target.value })} placeholder="3+" />
+                      <label className="form-label">Learning Start Date</label>
+                      <input type="date" className="form-input" value={homeForm.learningStartDate} onChange={e => setHomeForm({ ...homeForm, learningStartDate: e.target.value })} />
                     </div>
                   </div>
 
@@ -783,6 +774,10 @@ export default function AdminPanel() {
                       <input type="text" className="form-input" required value={projectForm.tools} onChange={e => setProjectForm({ ...projectForm, tools: e.target.value })} placeholder="Linux, Wireshark, Bash" />
                     </div>
                     <div className="form-group">
+                      <label className="form-label">Project Link</label>
+                      <input type="url" className="form-input" value={projectForm.link} onChange={e => setProjectForm({ ...projectForm, link: e.target.value })} placeholder="https://github.com/joxadevoo/project-name" />
+                    </div>
+                    <div className="form-group">
                       <label className="form-label">Description</label>
                       <textarea className="form-input" required rows="4" value={projectForm.description} onChange={e => setProjectForm({ ...projectForm, description: e.target.value })} placeholder="A short explanation of the project..."></textarea>
                     </div>
@@ -802,6 +797,7 @@ export default function AdminPanel() {
                       <div>
                         <div style={{ color: 'var(--text)', fontFamily: 'Share Tech Mono', fontSize: '0.9rem' }}>{project.title}</div>
                         <div style={{ color: 'var(--text-dim)', fontSize: '0.75rem' }}>{project.tag}</div>
+                        {project.link && <div style={{ color: 'var(--text-dim)', fontSize: '0.75rem' }}>LINKED</div>}
                       </div>
                       {pendingDelete?.table === 'projects' && pendingDelete?.id === project.id
                         ? renderDeleteConfirm()

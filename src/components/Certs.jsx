@@ -36,9 +36,13 @@ export default function Certs() {
   return (
     <section id="certs">
       <div className="section-header">
-        <div className="section-eyebrow">03 - Certifications</div>
+        <div className="section-eyebrow">04 - Certifications</div>
         <h2 className="section-title">{t('certs.title')}</h2>
       </div>
+
+      {certs.length === 0 ? (
+        <div className="section-note">{t('certs.comingSoon')}</div>
+      ) : (
       <div className="cert-grid">
         {certs.map((c, i) => {
           const IconEl = iconMap[c.icon] || <Award size={24} />;
@@ -56,6 +60,7 @@ export default function Certs() {
           );
         })}
       </div>
+      )}
     </section>
   );
 }

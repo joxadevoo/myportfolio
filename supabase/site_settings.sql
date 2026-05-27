@@ -39,9 +39,7 @@ values (
   'home_profile',
   '{
     "stats": {
-      "certificates": "6+",
-      "projects": "10+",
-      "years": "3+"
+      "learningStartDate": "2024-11-27"
     },
     "about": {
       "location": "Uzbekistan",

@@ -23,6 +23,9 @@ create table if not exists public.blog_comments (
   created_at timestamptz not null default now()
 );
 
+alter table if exists public.projects
+  add column if not exists link text;
+
 alter table public.blog_comments
   add column if not exists parent_id uuid references public.blog_comments(id) on delete cascade;
 

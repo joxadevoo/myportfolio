@@ -1,6 +1,18 @@
 import React, { useEffect, useState } from 'react';
 import { useTranslation } from 'react-i18next';
+import { ExternalLink } from 'lucide-react';
 import { supabase, isSupabaseConfigured } from '../lib/supabaseClient';
+
+function safeExternalUrl(value) {
+  if (!value) return null;
+
+  try {
+    const url = new URL(value);
+    return ['http:', 'https:'].includes(url.protocol) ? url.href : null;
+  } catch {
+    return null;
+  }
+}
 
 export default function ProjectGrid() {
   const { t } = useTranslation();
@@ -47,7 +59,7 @@ export default function ProjectGrid() {
     return (
       <section id="projects">
         <div className="section-header">
-          <div className="section-eyebrow">04 - Projects</div>
+          <div className="section-eyebrow">05 - Projects</div>
           <h2 className="section-title">{t('projects.title')}</h2>
         </div>
         <div style={{ textAlign: 'center', padding: '40px', color: 'var(--text-muted)' }}>
@@ -56,7 +68,7 @@ export default function ProjectGrid() {
               ERROR: {errorMsg} - {t('projects.error')}
             </div>
           ) : (
-            <div>{t('projects.empty')}</div>
+            <div className="section-note">{t('projects.comingSoon')}</div>
           )}
         </div>
       </section>
@@ -66,12 +78,14 @@ export default function ProjectGrid() {
   return (
     <section id="projects">
       <div className="section-header">
-        <div className="section-eyebrow">04 - Projects</div>
+        <div className="section-eyebrow">05 - Projects</div>
         <h2 className="section-title">{t('projects.title')}</h2>
       </div>
       <div className="projects-grid">
         {projects.map((p, i) => {
           const numStr = (i + 1).toString().padStart(2, '0');
+          const projectUrl = safeExternalUrl(p.link);
+
           return (
             <div className="project-card" key={p.id}>
               <div className="project-num">{numStr}</div>
@@ -83,6 +97,11 @@ export default function ProjectGrid() {
                   <span className="tool-tag" key={idx}>{t}</span>
                 ))}
               </div>
+              {projectUrl && (
+                <a href={projectUrl} className="project-link" target="_blank" rel="noreferrer">
+                  {t('projects.viewProject')} <ExternalLink size={14} />
+                </a>
+              )}
             </div>
           );
         })}
